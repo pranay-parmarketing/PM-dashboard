@@ -1,49 +1,3 @@
-// import React from "react";
-// import Modal from "./Modal"; // Import the reusable Modal component
-// import axios from 'axios';
-
-// const ChooseFileModal = ({
-//   isOpen,
-//   onClose,
-//   title,
-//   onFileChange,
-//   onFileSave,
-//   errorMessage,
-//   Name,
-// }) => {
-//   return (
-//     <Modal
-//       isOpen={isOpen}
-//       onClose={onClose}
-//       title={title || `Import ${Name}`} // Default title if not provided
-//       footer={
-//         <>
-//           <button className="modal-footer-btn" onClick={onClose}>
-//             Cancel
-//           </button>
-//           <button className="modal-footer-btn save-btn" onClick={onFileSave}>
-//             Save
-//           </button>
-//         </>
-//       }
-//     >
-//       <div className="modal-body-content">
-//         <label className="modal-label">
-//           {Name} Import
-//           <input
-//             type="file"
-//             className={`modal-input ${errorMessage ? "input-error" : ""}`}
-//             onChange={onFileChange}
-//           />
-//         </label>
-//         {errorMessage && <span className="error-text">{errorMessage}</span>}
-//       </div>
-//     </Modal>
-//   );
-// };
-
-// export default ChooseFileModal;
-
 import React, { useState } from "react";
 import Modal from "./Modal"; // Import the reusable Modal component
 import axios from "axios";
@@ -85,7 +39,7 @@ const ChooseFileModal = ({
       const response = await axios.post(apiEndpoint, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log("Response:", response.data);
+    
       alert("File uploaded successfully!");
       onClose(); // Close the modal after successful upload
     } catch (err) {

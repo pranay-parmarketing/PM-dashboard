@@ -1,102 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import Modal from './Modal'; // Assuming Modal component is imported correctly
-
-// const AddModal = ({ Name, isOpen, onClose, selected }) => {
-//   const [accountName, setAccountName] = useState("");
-//   const [selectedTable, setSelectedTable] = useState("");
-//   const [errors, setErrors] = useState({
-//     accountName: false,
-//     selectedTable: false,
-//   });
-
-//   // Pre-fill the data when 'selected' changes
-//   useEffect(() => {
-//     if (selected) {
-//       setAccountName(selected.name || "");
-//       setSelectedTable(selected.table || "");
-//     } else {
-//       setAccountName("");
-//       setSelectedTable("");
-//     }
-//   }, [selected]);
-
-//   const validateForm = () => {
-//     const newErrors = {
-//       accountName: accountName === "",
-//       selectedTable: selectedTable === "",
-//     };
-//     setErrors(newErrors);
-
-//     return !Object.values(newErrors).includes(true);
-//   };
-
-//   const handleSubmit = () => {
-//     if (validateForm()) {
-//       // Handle form submission logic here
-
-//       onClose(); // Close the modal after submission
-//     } else {
-//       console.log("Please fill all the fields before submitting.");
-//     }
-//   };
-
-//   const footerContent = (
-//     <>
-//       <button className="modal-footer-btn" onClick={onClose}>
-//         Close
-//       </button>
-//       <button className="modal-footer-btn save-btn" onClick={handleSubmit}>
-//         Submit
-//       </button>
-//     </>
-//   );
-
-//   return (
-//     <Modal
-//       isOpen={isOpen}
-//       onClose={onClose}
-//       title={selected ? `Edit ${Name}` : `Add ${Name}`} // Change modal title
-//       footer={footerContent}
-//     >
-//       <div className="modal-body-content">
-//         <label className="modal-label">
-//           Add {Name}
-//           <input
-//             type="text"
-//             className={`modal-input ${errors.accountName ? "input-error" : ""}`}
-//             placeholder="Enter Account Name"
-//             value={accountName}
-//             onChange={(e) => setAccountName(e.target.value)}
-//           />
-//           {errors.accountName && (
-//             <span className="error-text">Account Name is required</span>
-//           )}
-//         </label>
-
-//         <label className="modal-label">
-//           Accounts
-//           <select
-//             className={`modal-input ${errors.selectedTable ? "input-error" : ""}`}
-//             value={selectedTable}
-//             onChange={(e) => setSelectedTable(e.target.value)}
-//           >
-//             <option value="">Select Account</option>
-//             <option value="yesloans">Yesloans</option>
-//             <option value="singledebt">SingleDebt</option>
-//             <option value="taurus_collection">Taurus Collection</option>
-//             <option value="loan_sanction">Loan Sanction</option>
-//           </select>
-//           {errors.selectedTable && (
-//             <span className="error-text">Select a table</span>
-//           )}
-//         </label>
-//       </div>
-//     </Modal>
-//   );
-// };
-
-// export default AddModal;
-
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal"; // Assuming Modal component is imported correctly
 import { MONGO_URI } from "../../Variables/Variables";
@@ -172,20 +73,20 @@ const AddModal = ({ Name, isOpen, onClose, selected, apiEndpoint }) => {
       if (isArrayRequired) {
         data = [data];
       }
-      console.log("this is scount data", data);
+    
 
       try {
         const response = await axios.post(apiEndpoint, data, {
           headers: { "Content-Type": "application/json" },
         });
-        console.log("response", response, response.status);
+       
 
         if (response.status === 200) {
-          console.log("Data saved successfully:", response.data);
+        
           // Fetch updated data
           const updatedResponse = await axios.get(apiEndpoint); // Replace with correct GET API
           setAccountOptions(updatedResponse.data); // Update state with new data
-          console.log("updatedResponse.data", updatedResponse.data);
+         
         }
       } catch (error) {
         console.error("Error during submission:", error);
@@ -244,7 +145,7 @@ const AddModal = ({ Name, isOpen, onClose, selected, apiEndpoint }) => {
               accountOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.name}
-                  {console.log(option)}
+                 
                 </option>
               ))
             ) : (

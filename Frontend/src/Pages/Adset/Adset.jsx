@@ -48,7 +48,6 @@ const Adset = () => {
           },
         }
       );
-      console.log("Campaign data saved successfully:", saveResponse);
     } catch (saveError) {
       console.error(
         "Error saving campaign data:",
@@ -100,7 +99,7 @@ const Adset = () => {
     } else if (typeof selectedAccount === "object") {
       accountId = selectedAccount.id || selectedAccount.accountId;
     }
-    // 
+    //
     if (accountId) {
       const initialUrl = `https://graph.facebook.com/v17.0/act_${accountId}/adsets?fields=id,name,account_id,campaign_id,daily_budget,optimization_goal,start_time,end_time,status,targeting,promoted_object,campaign{name}`;
       const allCampaignData = await fetchAllCampaignData(initialUrl);
@@ -117,8 +116,6 @@ const Adset = () => {
       loadCampaignData(); // Trigger the loading of campaign data when selectedAccount changes
     }
   }, [selectedAccount, accessToken, appSecretProof]); // Trigger the effect when selectedAccount, accessToken, or appSecretProof changes
-
-
 
   const handleEdit = (row) => {
     setSelectedRow(row);
@@ -143,7 +140,6 @@ const Adset = () => {
       setIsModalOpen(false);
     }
   };
-
 
   const filteredData = Array.isArray(mongoData)
     ? mongoData.filter(
@@ -217,7 +213,6 @@ const Adset = () => {
 
     fetchCampaigns();
   }, [selectedAccount]);
-  console.log("this is mongodb data", mongoData);
 
   //
   const handleRowsPerPageChange = (event) => {
@@ -284,7 +279,7 @@ const Adset = () => {
           }`}
         >
           <SelectInputs
-          name="adset"
+            name="adset"
             rowsPerPage={rowsPerPage}
             setSearch={setSearch}
             search={search}

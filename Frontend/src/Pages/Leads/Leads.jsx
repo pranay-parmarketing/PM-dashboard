@@ -165,14 +165,12 @@ const Leads = () => {
   const filterData = (data, searchQuery) => {
     if (!searchQuery) return data; // Return all data if no search query
  
-  console.log('searchQuery',searchQuery);
-  
+ 
 
     const searchTerm = searchQuery.toLowerCase(); // Convert search term to lowercase once
 
     return data.filter((row) => {
-      console.log("Checking row:", row.createdOn);
-      // Check if any of the fields match the search term
+    
       return (
         (row.name && row.name.toLowerCase().includes(searchTerm)) ||
         (row._id && row._id.toLowerCase().includes(searchTerm)) ||
@@ -230,37 +228,7 @@ const Leads = () => {
   const isNextButtonDisabled = currentPage >= totalPages - 1;
   const isPrevButtonDisabled = currentPage <= 0;
 
-  // useEffect(() => {
-  //   const fetchCampaigns = async () => {
-  //     try {
-  //       const response = await axios.get(`${MONGO_URI}/api/leads`, {
-  //         params: {
-  //           page: currentPage + 1,
-  //           pageSize: rowsPerPage,
-            // search: search,
-            // sortOrder: "asc",
-  //           startDate: startDate,  // Replace with your actual start date
-  //           endDate: endDate ,
-  //         },
-  //       });
-
-  //       if (response.data.leads) {
-  //         setMongoData(response.data); // Full response for debugging or future use
-          // setCampaignDetails(response.data.leads); // Store only the leads array
-          // setCurrentPage(response.data.currentPage - 1); // Adjust for 0-based index in state
-          // setTotalPages(response.data.totalPages);
-  //       } else {
-  //         console.error("No leads found in the response");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching leads data:", error);
-  //     }
-  //   };
-
-  //   if (selectedAccount) {
-  //     fetchCampaigns(); // Trigger fetch when selectedAccount or pagination params change
-  //   }
-  // }, [selectedAccount, MONGO_URI, rowsPerPage, currentPage]);
+ 
   
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -292,8 +260,6 @@ const Leads = () => {
     fetchCampaigns();  // Trigger fetch when the component loads or dependencies change
   }, [currentPage, rowsPerPage, startDate, endDate]);  // Dependencies for refetching data
 
-  console.log("search", search);
-
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(Number(event.target.value));
@@ -318,191 +284,9 @@ const Leads = () => {
 
 
   
-  // const filterByDate = (details, preset, customStartDate, customEndDate) => {
-  //   console.log("Details Data:", details); // Log the data for debugging
-  //   const currentDate = new Date();
-  //   let filteredData = [];
-
-  //   if (!Array.isArray(details) || details.length === 0) {
-  //     console.warn("No details available to filter");
-  //     return [];
-  //   }
-
-  //   switch (preset) {
-  //     case "last-7-days": {
-  //       const last7Days = new Date();
-  //       last7Days.setDate(currentDate.getDate() - 7);
-  //       last7Days.setHours(0, 0, 0, 0); // Normalize to start of the day
-
-  //       console.log("Filtering for last 7 days from:", last7Days);
-
-  //       filteredData = details.filter((detail) => {
-  //         const createdDate = detail.createdOn
-  //           ? new Date(detail.createdOn)
-  //           : null;
-
-  //         console.log("Detail createdOn raw:", detail.createdOn);
-  //         console.log("Parsed createdDate:", createdDate);
-
-  //         if (createdDate) createdDate.setHours(0, 0, 0, 0); // Normalize the created date to start of the day
-  //         console.log(
-  //           "Is the detail within the last 7 days? Comparison:",
-  //           createdDate >= last7Days
-  //         );
-
-  //         return createdDate && createdDate >= last7Days;
-  //       });
-
-  //       console.log("Filtered data for last 7 days:", filteredData);
-  //       break;
-  //     }
-
-  //     case "last-14-days": {
-  //       const last14Days = new Date();
-  //       last14Days.setDate(currentDate.getDate() - 14); // Set the date to 14 days ago
-  //       last14Days.setHours(0, 0, 0, 0); // Normalize to start of the day
-
-  //       console.log("Filtering for last 14 days from:", last14Days);
-
-  //       filteredData = details.filter((detail) => {
-  //         const createdDate = detail.createdOn
-  //           ? new Date(detail.createdOn)
-  //           : null;
-
-  //         console.log("Detail createdOn raw:", detail.createdOn);
-  //         console.log("Parsed createdDate:", createdDate);
-
-  //         if (createdDate) createdDate.setHours(0, 0, 0, 0); // Normalize
-
-  //         console.log(
-  //           "Is the detail within the last 14 days? Comparison:",
-  //           createdDate >= last14Days
-  //         );
-
-  //         return createdDate && createdDate >= last14Days;
-  //       });
-
-  //       console.log("Filtered data for last 14 days:", filteredData);
-  //       break;
-  //     }
-
-  //     case "last-30-days": {
-  //       const last30Days = new Date();
-  //       last30Days.setDate(currentDate.getDate() - 30);
-  //       last30Days.setHours(0, 0, 0, 0);
-
-  //       console.log("Filtering for last 30 days from:", last30Days);
-
-  //       filteredData = details.filter((detail) => {
-  //         const createdDate = detail.createdOn
-  //           ? new Date(detail.createdOn)
-  //           : null;
-  //         console.log("Detail createdOn raw:", detail.createdOn);
-  //         console.log("Parsed createdDate:", createdDate);
-
-  //         if (createdDate) createdDate.setHours(0, 0, 0, 0); // Normalize
-  //         console.log(
-  //           "Is the detail within the last 30 days? Comparison:",
-  //           createdDate >= last30Days
-  //         );
-
-  //         return createdDate && createdDate >= last30Days;
-  //       });
-
-  //       console.log("Filtered data for last 30 days:", filteredData);
-  //       break;
-  //     }
-
-  //     case "yesterday": {
-  //       const yesterday = new Date();
-  //       yesterday.setDate(currentDate.getDate() - 1); // Set the date to yesterday
-  //       yesterday.setHours(0, 0, 0, 0); // Normalize to start of the day
-
-  //       console.log("Filtering for yesterday from:", yesterday);
-
-  //       filteredData = details.filter((detail) => {
-  //         const createdDate = detail.createdOn
-  //           ? new Date(detail.createdOn)
-  //           : null;
-
-  //         console.log("Detail createdOn raw:", detail.createdOn);
-  //         console.log("Parsed createdDate:", createdDate);
-
-  //         if (createdDate) createdDate.setHours(0, 0, 0, 0); // Normalize
-
-  //         console.log(
-  //           "Is the detail from yesterday? Comparison:",
-  //           createdDate &&
-  //             createdDate.toDateString() === yesterday.toDateString()
-  //         );
-
-  //         return (
-  //           createdDate &&
-  //           createdDate.toDateString() === yesterday.toDateString()
-  //         );
-  //       });
-
-  //       console.log("Filtered data for yesterday:", filteredData);
-  //       break;
-  //     }
-
-      
-      
-
-  //     case "custom-range": {
-  //       console.log("Start Date:", customStartDate);
-  //       console.log("End Date:", customEndDate);
-      
-  //       if (customStartDate && customEndDate) {
-  //         // Parse custom start and end dates
-  //         const startDate = new Date(customStartDate);
-  //         const endDate = new Date(customEndDate);
-      
-  //         // Set time for start and end of the day
-  //         startDate.setHours(0, 0, 0, 0); // Start of the day for start date
-  //         endDate.setHours(23, 59, 59, 999); // End of the day for end date
-      
-  //         console.log("Filtering for custom range from:", startDate, "to:", endDate);
-      
-  //         // Filter the data based on the custom date range
-  //         const filteredData = axios.get(`${MONGO_URI}/api/leads`, {
-  //           params: {
-  //             startDate: customStartDate,  // Replace with your actual start date
-  //             endDate: customEndDate ,    // Replace with your actual end date
-  //             // sortOrder: "desc",
-  //           }
-  //         })
-  //         .then(response => {
-  //           console.log('startDate,Filtered Data:', response.data);
-           
-            
-  //         })
-  //         .catch(error => {
-  //           console.error('Error fetching data:', error);
-  //         });
-          
-        
-      
-  //         console.log("Filtered data for custom range:", filteredData);
-  //       } else {
-  //         console.warn("Custom date range is not provided.");
-  //       }
-  //       break;
-  //     }
-      
-
-  //     case "all-time":
-  //     default:
-  //       console.log("All-time filtering, returning all details");
-  //       filteredData = details; // No filtering for all-time
-  //       break;
-  //   }
-
-  //   console.log("Filtered Data:", filteredData);
-  //   return filteredData;
-  // };
+ 
   const filterByDate = (details, preset) => {
-    console.log("Details Data:", details); // Log the data for debugging
+   
     const currentDate = new Date();
     let filteredData = [];
 
@@ -562,28 +346,7 @@ const Leads = () => {
   };
 
 
-  // const getFilteredData = () => {
-  //   let dataToFilter = [];
-
-  //   if (Array.isArray(mongoData?.leads) && mongoData?.leads.length > 0) {
-  //     dataToFilter = mongoData.leads;
-  //     console.log('dataToFilter',mongoData.leads);
-      
-  //   } else if (Array.isArray(mydata) && mydata.length > 0) {
-  //     dataToFilter = mydata;
-  //   }
-
-  //   // Apply search filter
-  //   const searchFilteredData = filterData(dataToFilter, search);
-
-  //   // Apply date filter details, preset, customStartDate, customEndDate
-  //   // const finalFilteredData = filterByDate(searchFilteredData, datePreset, '2024-12-30', '2025-01-15'    );
-  //   const finalFilteredData = filterByDate(searchFilteredData, datePreset, startDate, endDate);
-
-  //   return finalFilteredData;
-  // };
-
-  // Use this function wherever `filteredData` is needed
+  
   const getFilteredData = () => {
     let dataToFilter = [];
   
@@ -612,8 +375,6 @@ const Leads = () => {
   const filteredData = getFilteredData();
 
  
-  console.log("Mongo Data:", mongoData);
-
 
   //
 

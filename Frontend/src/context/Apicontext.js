@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import { MONGO_URI } from "../Variables/Variables";
+
 
 // Create the context with default values
 export const ApiTokenContext = createContext({
@@ -43,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   // Function to generate appsecret_proof
   const generateAppSecretProof = async (accessToken) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/authtoken", { accessToken });
+      const response = await axios.post(`${MONGO_URI}/api/authtoken`, { accessToken });
       const proof = response.data.appsecret_proof;
       setAppsecret_proof(proof);
       return proof;

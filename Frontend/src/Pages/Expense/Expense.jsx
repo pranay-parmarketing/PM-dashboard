@@ -69,13 +69,11 @@ const Expense = () => {
       let currentUrl = url;
       while (currentUrl) {
         const finalUrl = `${currentUrl}`;
-        // const finalUrl = `${currentUrl}&access_token=${accessToken}&appsecret_proof=${appSecretProof}`;
         const response = await fetch(finalUrl);
         const result = await response.json();
-        console.log("result", result);
+      
 
-        // if (result?.data) {
-        //   const newIds = result?.data.map((item) => item.id);
+      
 
         if (result) {
           const newIds = result?.map((item) => item.id);
@@ -145,18 +143,16 @@ const Expense = () => {
       const expirationTime = parseInt(storedExpiration, 10);
       const currentTime = Date.now();
 
-      // Check if data is expired
       if (currentTime < expirationTime) {
         return JSON.parse(storedData);
       } else {
-        // Clear expired data
         localStorage.removeItem(dataKey);
         localStorage.removeItem(expirationKey);
       }
     }
     return null;
   };
-  console.log("allIds", allIds);
+
 
   useEffect(() => {
     if (selectedAccount) {
@@ -166,7 +162,6 @@ const Expense = () => {
           : selectedAccount.id || selectedAccount.accountId;
 
       if (accountId) {
-        // const initialUrl = `https://graph.facebook.com/v17.0/act_${accountId}/campaigns?fields=id,name,status,objective,start_time,daily_budget`;
         const initialUrl = `${MONGO_URI}/api/save-campaigns/${accountId}`;
         const storedCampaignDetails = getStoredData();
 
@@ -344,8 +339,7 @@ const Expense = () => {
             `${MONGO_URI}/api/save-expense/${id}`
           );
 
-          console.log("response", response);
-          console.log("response", response?.data.length);
+        
           if (response?.data.length > 0) {
             campaignData.push(...response?.data);
           } else {
@@ -465,16 +459,7 @@ const Expense = () => {
                           {/* Format the date */}
                           {detail.name}
                         </td>
-                        {console.log("detail", detail)}
-                        {console.log("detail?.adsets", detail?.adsets)}
-                        {console.log(
-                          "detail?.adsets?.insights",
-                          detail?.adsets?.data
-                        )}
-                        {console.log(
-                          "detail?.adsets?.insights?.data",
-                          detail?.adsets?.insights?.data
-                        )}
+
 
                         {/* work on this addition of all spend  */}
                         <td data-label="Total Budget" className="px-4 py-2">

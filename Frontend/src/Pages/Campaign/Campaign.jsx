@@ -223,12 +223,12 @@ const Campaign = () => {
         const response = await axios.get(
           `${MONGO_URI}/api/save-campaigns/${selectedAccount.id}`
         );
-        console.log("response", response);
+     
 
         const fetchedCampaigns = Array.isArray(response.data)
           ? response.data
           : [response.data]; // Ensure data is an array
-        console.log("fetchedCampaigns", fetchedCampaigns);
+      
 
         // Update state with fetched campaigns
         setMongoData(fetchedCampaigns);
@@ -366,12 +366,7 @@ const Campaign = () => {
                           >
                             <FaEdit />
                           </button>
-                          {/* <button
-                            className="text-red-500"
-                            onClick={() => handleDelete(row.id)}
-                          >
-                            <FaTrashAlt />
-                          </button> */}
+                        
                         </td>
                       </tr>
                     ))

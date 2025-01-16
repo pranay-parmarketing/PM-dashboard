@@ -48,7 +48,6 @@ const Ads = () => {
           },
         }
       );
-      console.log("Campaign data saved successfully:", saveResponse);
     } catch (saveError) {
       console.error(
         "Error saving campaign data:",
@@ -90,28 +89,6 @@ const Ads = () => {
     }
   };
 
-  // Function to load campaign data on component mount or when selectedAccount changes
-  // const loadCampaignData = async () => {
-  //   let accountId = null;
-
-  //   // Determine the correct accountId from selectedAccount
-  //   if (typeof selectedAccount === "string") {
-  //     accountId = selectedAccount;
-  //   } else if (typeof selectedAccount === "object") {
-  //     accountId = selectedAccount.id || selectedAccount.accountId;
-  //   }
-
-  //   if (accountId) {
-  //     const initialUrl = `https://graph.facebook.com/v17.0/act_${accountId}/ads?fields=id,name,status,created_time,updated_time,adset_id,campaign_id,targeting,custom_audiences,flexible_spec,geo_locations,adset{name},account_id`;
-  //     const allCampaignData = await fetchAllCampaignData(initialUrl);
-
-  //     setData(allCampaignData); // Store fetched data in state
-  //     setCampaignDetails(allCampaignData); // Store campaign details
-  //   } else {
-  //     console.error("Invalid selectedAccount:", selectedAccount);
-  //   }
-  // };
-
   const loadCampaignData = async () => {
     try {
       let accountId = null;
@@ -127,7 +104,6 @@ const Ads = () => {
         const initialUrl = `https://graph.facebook.com/v17.0/act_${accountId}/ads?fields=id,name,status,created_time,updated_time,adset_id,campaign_id,targeting,custom_audiences,flexible_spec,geo_locations,adset{name},account_id`;
 
         const allCampaignData = await fetchAllCampaignData(initialUrl);
-        console.log("All Campaign Data:", allCampaignData);
 
         setData(allCampaignData);
         setCampaignDetails(allCampaignData);
@@ -179,8 +155,6 @@ const Ads = () => {
 
   // Calculate total pages dynamically
   const totalPages = Math.ceil(mongoData[0]?.data.length / rowsPerPage);
-  console.log('totalPages',totalPages,mongoData.length,rowsPerPage,mongoData.length / rowsPerPage);
-  
 
   // Update paginated details when currentPage, rowsPerPage, or campaignDetails change
   const updatePaginatedDetails = () => {
@@ -194,7 +168,7 @@ const Ads = () => {
   };
 
   useEffect(() => {
-    // If currentPage exceeds the available pages, reset to the last valid page  
+    // If currentPage exceeds the available pages, reset to the last valid page
     if (currentPage >= totalPages) {
       setCurrentPage(totalPages - 1);
     }
@@ -214,8 +188,6 @@ const Ads = () => {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
-  console.log('currentPage',currentPage,totalPages,currentPage < totalPages - 1);
-  
 
   // Handle previous page
   const handlePreviousPage = () => {
@@ -245,7 +217,6 @@ const Ads = () => {
 
     fetchCampaigns();
   }, [selectedAccount]);
-  console.log("this is mongodb data", mongoData);
 
   //
   const handleRowsPerPageChange = (event) => {
@@ -312,7 +283,7 @@ const Ads = () => {
           }`}
         >
           <SelectInputs
-          name="ads"
+            name="ads"
             rowsPerPage={rowsPerPage}
             setSearch={setSearch}
             search={search}
@@ -355,7 +326,6 @@ const Ads = () => {
                         <td data-label="Facebook Campaign ID">{row.id}</td>
                         <td data-label="Facebook Status">
                           {row.adset?.name || "N/A"}
-                          {console.log("Row data:", row)}
                         </td>
                         <td data-label="Account">{selectedAccount.name}</td>
                         <td data-label="Actions">

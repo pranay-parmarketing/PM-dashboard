@@ -51,8 +51,7 @@ const Account = () => {
       if (response.status === 200) {
         // If deletion is successful, re-fetch the data
         const updatedTotalCount = response.length;
-        console.log("updatedTotalCount", updatedTotalCount);
-
+       
         setTotalPages(Math.ceil(updatedTotalCount / rowsPerPage));
         fetchCampaignData(); // Re-fetch data
       } else {
@@ -89,8 +88,7 @@ const Account = () => {
       )
     : [];
 
-  //
-  console.log("rowsPerPage", rowsPerPage);
+    
 
   const updatePaginatedDetails = () => {
     const startIndex = currentPage * rowsPerPage;
@@ -131,7 +129,7 @@ const Account = () => {
   const isNextButtonDisabled = currentPage >= totalPages - 1;
   const isPrevButtonDisabled = currentPage <= 0;
   //
-  console.log("totalPages", totalPages);
+ 
   //
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(Number(event.target.value));
