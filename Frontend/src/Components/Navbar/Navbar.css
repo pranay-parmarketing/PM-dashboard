@@ -1,0 +1,58 @@
+/* Navbar.css */
+
+.navbar {
+  width: 100%;
+  background-color: #f5f5f5; /* Background color */
+  padding: 8px 16px; /* Add some padding */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow for navbar */
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping for smaller screens */
+}
+
+.left {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Adjust the dropdown for mobile screens */
+.dropdown {
+  min-width: 150px;
+}
+
+/* Adjust the profile icon size */
+.profile-icon-img {
+  font-size: 32px;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 600px) {
+  .wrapper {
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Align items to start for better readability */
+    justify-content: space-between;
+  }
+
+  .left {
+    font-size: 0.9rem; /* Reduce font size for mobile */
+  }
+
+  .dropdown {
+    width: 100%; /* Full width on mobile for easy selection */
+  }
+
+  .profile-icon {
+    margin-top: 8px;
+  }
+}

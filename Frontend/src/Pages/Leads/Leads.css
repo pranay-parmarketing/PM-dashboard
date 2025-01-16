@@ -1,0 +1,47 @@
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  .responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .responsive-table th,
+  .responsive-table td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  @media (max-width: 600px) {
+    .responsive-table thead {
+      display: none;
+    }
+  
+    .responsive-table tr {
+      display: block;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    .responsive-table td {
+      display: flex;
+      justify-content: space-between;
+      text-align: left;
+      padding: 8px;
+      font-size: 16px;
+    }
+  
+    .responsive-table td::before {
+      content: attr(data-label);
+      flex-basis: 40%;
+      font-weight: bold;
+    }
+  
+    .responsive-table td {
+      flex-basis: 60%;
+    }
+  }
+  

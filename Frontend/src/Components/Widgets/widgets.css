@@ -1,0 +1,42 @@
+.widget {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(255, 114, 0, 0.3); /* Shadow color */
+    border-radius: 12px;
+    height: 120px;
+    background: #ffcc80; /* Widget background color */
+    transition: box-shadow 0.3s, transform 0.3s;
+    text-align: center;
+    position: relative; /* For positioning icon */
+    overflow: hidden; /* Ensure icons don't overflow */
+  }
+  
+  .widget:hover {
+    box-shadow: 0 6px 12px rgba(255, 114, 0, 0.4); /* Darker shadow on hover */
+    transform: translateY(-4px);
+  }
+  
+  .widgetTitle {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .widgetValue {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff7200; /* Text color */
+  }
+  
+  .widgetIcon {
+    font-size: 2rem;
+    color: #ff7200; /* Icon color */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  

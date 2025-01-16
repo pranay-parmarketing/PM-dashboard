@@ -1,0 +1,38 @@
+/* Optional: Customize Tooltip style */
+.antv-tooltip {
+  background-color: rgba(255, 193, 7, 0.9) !important;
+  color: #333 !important;
+  font-size: 14px !important;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.antv-tooltip-title {
+  font-weight: 600;
+}
+
+/* Remove Points and Grid */
+.antv-point {
+  display: none; /* Hides the points on the chart */
+}
+
+.chartGrid {
+  display: none; /* Removes grid lines */
+}
+
+/* Line Styling */
+.ant-line {
+  stroke: #3498db; /* Line color */
+  transition: stroke 0.3s ease;
+}
+
+.ant-line:hover {
+  stroke: #1f78d1; /* Darker shade when hovered */
+}
+
+/* Ensure chart takes full width */
+.chart-wrapper {
+  width: 100% !important; /* Forces the chart to take up the full width of its container */
+  height: auto !important; /* Adjust height to maintain aspect ratio */
+}

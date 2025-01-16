@@ -1,0 +1,223 @@
+/* Existing styles for the modal */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .modal-content {
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    border-radius: 12px;
+    width: 600px;
+    max-width: 90%;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.4s ease;
+    overflow: hidden;
+  }
+  
+  .modal-header {
+    padding: 20px;
+    background: #ff7200;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+  }
+  
+  .modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .modal-close-btn:hover {
+    color: #ffcc80;
+  }
+  
+  .modal-body {
+    padding: 20px;
+    color: #333;
+    font-size: 16px;
+  }
+  
+  .modal-body-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    font-size: 16px;
+  }
+  
+  .modal-description {
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  .modal-link-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .modal-link {
+    color: #ff7200;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .modal-link:hover {
+    text-decoration: underline;
+  }
+  
+
+  
+  .modal-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+  }
+  .modal-select {
+    width: 100%;
+    padding: 12px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    appearance: none;
+    position: relative;
+    background-image: linear-gradient(45deg, transparent 50%, #ff7200 50%), linear-gradient(135deg, #ff7200 50%, transparent 50%);
+    background-position: calc(100% - 10px) calc(1em + 5px), calc(100% - 5px) calc(1em + 5px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
+  
+  .modal-select:focus {
+
+    border-color: #ff7200;
+    box-shadow: 0px 0px 8px rgba(255, 114, 0, 0.3);
+    outline: none;
+  }
+  
+  .modal-label {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    font-weight: bold;
+    color: #ff7200;
+  }
+  
+  
+  
+  
+  
+  .modal-input:focus {
+    border-color: #ff7200; /* Orange color on focus */
+    outline: none;
+  }
+  
+  .modal-footer {
+    padding: 15px;
+    background: #ffffff; /* White background for the footer */
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  /* Custom button styles */
+  .open-modal-btn {
+    background-color: #1877f2; /* Facebook blue color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 20px; /* Optional: add margin for spacing */
+    max-width: 200px; /* Set a max width for the button */
+    width: auto; /* Ensure the width adjusts to the content */
+  }
+  
+  .open-modal-btn:hover {
+    background-color: #165eab; /* Darker blue for hover effect */
+  }
+  
+  .modal-footer-btn {
+    background-color: #ff7200;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .modal-footer-btn:hover {
+    background-color: #ff5722;
+  }
+  
+  .save-btn {
+    background-color: #4caf50;
+  }
+  
+  .save-btn:hover {
+    background-color: #45a049;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  .input-error {
+    border-color: #f03f42; /* Red border for error */
+  }
+  
+  .error-text {
+    color: #f03f42;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+  }
+  
+  

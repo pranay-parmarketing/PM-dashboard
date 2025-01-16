@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.login-page {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-page .container {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  padding: 40px;
+  width: 30%;
+  background: linear-gradient(135deg, #ffcc80, #ff7200);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s, background 0.5s;
+}
+
+.login-page .container:hover {
+  transform: scale(1.05);
+  background: rgba(255, 114, 0, 0.2);
+}
+
+.login-page .header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.login-page .text {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.login-page .subtext {
+  color: #ffffff;
+  font-size: 18px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.login-page .inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.login-page .input {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+  transition: box-shadow 0.3s, background 0.3s;
+  position: relative;
+}
+
+.login-page .eye-icon {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 20px;
+}
+
+.login-page .input:hover {
+  box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.login-page .input input {
+  flex-grow: 1;
+  height: 40px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 16px;
+  padding-left: 40px; /* To make room for the icon */
+}
+
+.login-page .input input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.login-page .input .icon {
+  position: absolute;
+  left: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 20px;
+}
+
+.login-page .submit-container {
+  margin-top: 30px;
+  width: 100%;
+}
+
+.login-page .submit {
+  width: 100%;
+  padding: 15px 0;
+  background: #fafafa;
+  color: #080202;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 15px rgba(31, 38, 135, 0.5);
+}
+
+.login-page .submit:hover {
+  background: #e9e9e9;
+  transform: translateY(-3px);
+}
+
+.login-page .submit:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 500px) {
+  .login-page .text {
+    font-size: 28px;
+  }
+
+  .login-page .submit {
+    font-size: 14px;
+  }
+}

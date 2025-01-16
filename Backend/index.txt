@@ -1,0 +1,132 @@
+require('dotenv').config();  // Load environment variables from .env file
+const axios = require('axios');
+const crypto = require('crypto');
+const mongoose = require('mongoose');
+const express = require('express');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const app = express();
+
+// Middleware
+app.use(bodyParser.json());
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log('MongoDB Connected'))
+  .catch((err) => console.error('MongoDB connection error:', err));
+
+// User Schema and Model
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Signup API
+app.post('/signup', async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Save user to database
+    const newUser = new User({ name, email, password: hashedPassword });
+    await newUser.save();
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+// Login API
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.status(200).json({ message: 'Login successful', token });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+// Load environment variables securely from .env
+const appSecret = process.env.FB_APP_SECRET; // Facebook App Secret
+const accessToken = process.env.FB_ACCESS_TOKEN; // Facebook Access Token
+
+// Function to generate appsecret_proof
+function generateAppSecretProof(accessToken, appSecret) {
+  return crypto
+    .createHmac('sha256', appSecret)
+    .update(accessToken)
+    .digest('hex');
+}
+
+// Function to fetch campaigns
+async function fetchCampaigns(adAccountId) {
+  try {
+    const appsecret_proof = generateAppSecretProof(accessToken, appSecret);
+
+    // Facebook Graph API URL
+    const apiUrl = `https://graph.facebook.com/v17.0/${adAccountId}/campaigns?fields=id,name,status,objective,start_time&access_token=${accessToken}&appsecret_proof=${appsecret_proof}`;
+    // console.log('API URL:', apiUrl);
+
+    // Make the API request
+    const response = await axios.get(apiUrl);
+    // console.log('API Response:', response.data);
+    return response.data;  // Return the campaigns data for further use
+  } catch (error) {
+    // Enhanced error handling
+    if (error.response) {
+      console.error('API Error:', error.response.data);
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw new Error('Error fetching campaigns from Facebook API.');
+  }
+}
+
+// Example usage with your Ad Account ID
+const adAccountId = 'act_390268725317115'; // Replace with your actual Ad Account ID
+
+fetchCampaigns(adAccountId)
+  .then((data) => {
+    // console.log('Campaign Data:', data);
+  })
+  .catch((error) => {
+    console.error('Failed to fetch campaigns:', error.message);
+  });
+
+// Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

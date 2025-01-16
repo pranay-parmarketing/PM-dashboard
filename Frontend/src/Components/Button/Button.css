@@ -1,0 +1,90 @@
+.custom-button {
+  background: linear-gradient(145deg, #ff7200, #ff7100); /* Gradient for a more dynamic look */
+  color: white;
+  border: none;
+  border-radius: 12px; /* Rounded corners for a modern feel */
+  padding: 12px 28px; /* Spacious padding for better touchability */
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Smooth transitions for background, transform, and shadow */
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2), -4px -4px 12px rgba(255, 255, 255, 0.1); /* Stronger shadow effect for depth */
+  outline: none;
+  text-transform: uppercase; /* Make the text uppercase for a bold look */
+}
+
+/* Hover state - Lighter color and raised effect */
+.custom-button:hover {
+  background: linear-gradient(145deg, #ff7200, #ff7100); /* Gradient for a more dynamic look */
+  transform: translateY(-4px); /* Raised effect */
+  box-shadow: 6px 6px 16px rgba(0, 0, 0, 0.3), -6px -6px 16px rgba(255, 255, 255, 0.1); /* Enhanced shadow for hover */
+}
+
+/* Active state - Pressed effect */
+.custom-button:active {
+  background: linear-gradient(145deg, #ff7200, #ff7100); /* Gradient for a more dynamic look */
+  transform: translateY(2px); /* Simulate pressing down */
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); /* Reduced shadow on press */
+}
+
+/* Focus state - Blue outline for accessibility */
+.custom-button:focus {
+  outline: 2px solid #1877f2; /* Blue outline */
+  box-shadow: 0 0 0 2px #1877f2; /* Blue glow effect on focus */
+}
+
+/* Specific button styles for open modal and save buttons */
+
+/* Open Modal Button */
+.open-modal-btn {
+  background: linear-gradient(145deg, #ff7200, #ff7300f5); /* Facebook blue gradient */
+}
+
+.open-modal-btn:hover {
+  background: linear-gradient(145deg, #ff7200, #ff7300f5); /* Facebook blue gradient */
+ transform: translateY(-4px);
+}
+
+.open-modal-btn:active {
+  background: linear-gradient(145deg, #c2651a, #c7610db0); /* Facebook blue gradient */
+  transform: translateY(2px);
+}
+
+/* Save Button */
+.save-btn {
+  background-color: #4caf50; /* Green color */
+}
+
+.save-btn:hover {
+  background-color: #45a049; /* Darker green */
+  transform: translateY(-4px);
+}
+
+.save-btn:active {
+  background-color: #388e3c; /* Darker green on press */
+  transform: translateY(2px);
+}
+
+/* Modal Footer Button */
+.modal-footer-btn {
+  background-color: #ff7200;
+}
+
+.modal-footer-btn:hover {
+  background-color: #ff7200; /* Darker shade on hover */
+  transform: translateY(-4px);
+}
+
+.modal-footer-btn:active {
+  background-color: #ff7200; /* Darker on click */
+  transform: translateY(2px);
+}
+
+/* Responsive Styles for Mobile */
+@media (max-width: 768px) {
+  .custom-button {
+    padding: 10px 20px; 
+    font-size: 14px; /* Smaller font size for mobile */
+    width: 100%; /* Full width on mobile */
+  }
+}
