@@ -441,8 +441,10 @@ const Leads = () => {
             search={search}
             handleRowsPerPageChange={handleRowsPerPageChange}
             setCurrentPage={setCurrentPage}
+            setMongoData={setMongoData}
+            setCampaignDetails={setCampaignDetails}
+            setTotalPages={setTotalPages}
           />
-
 
           <div className="overflow-x-auto">
             <table className="min-w-max table-auto">

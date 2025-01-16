@@ -52,6 +52,7 @@ const AllPayments = () => {
     const criteria = "((Payment_Number:equals:1)and(Status:equals:paid))";
     const encodedCriteria = encodeURIComponent(criteria);
 
+    // const accessToken = '';
     const accessToken = await refreshToken();
     let allData = [];
 
