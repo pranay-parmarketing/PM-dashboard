@@ -80,7 +80,7 @@ const SelectInputs = ({
 
   useEffect(() => {
     if (name !== "lead") return; // Only run the effect if the name is "lead"
-    
+
     if (search === "") return; // Prevent fetching if search is empty
 
     // API call when search value or page changes
