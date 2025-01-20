@@ -322,6 +322,51 @@ const Leads = () => {
         break;
       }
 
+      // 
+
+      case "last-30-days":{
+        const last30Days = new Date();
+        last30Days.setDate(currentDate.getDate() - 30);
+        last30Days.setHours(0, 0, 0, 0);
+
+          filteredData = details.filter((detail) => {
+            const createdDate = detail.createdOn ? new Date(detail.createdOn) : null;
+            if (createdDate) createdDate.setHours(0, 0, 0, 0); 
+            return createdDate && createdDate >= last30Days
+
+
+        });
+        break;
+      }
+
+      case "yesterday":{
+        const yesterday = new Date();
+        yesterday.setDate(currentDate.getDate() - 1);
+        yesterday.setHours(0, 0, 0, 0);
+
+        filteredData = details.filter((detail) => {
+          const createdDate = detail.createdOn ? new Date(detail.createdOn) : null;
+          if (createdDate) createdDate.setHours(0, 0, 0, 0); 
+          return createdDate && createdDate >= yesterday
+          });
+          break;
+        }
+
+      case "last-day":{
+        const lastDay = new Date();
+        lastDay.setDate(currentDate.getDate() - 1);
+        lastDay.setHours(0, 0, 0, 0);
+
+        filteredData = details.filter((detail) => {
+          const createdDate = detail.createdOn ? new Date(detail.createdOn) : null;
+          if (createdDate) createdDate.setHours(0, 0, 0, 0); 
+          return createdDate && createdDate >= lastDay
+        });
+        break;
+      }
+
+      // 
+
       case "custom-range": {
         if (startDate && endDate) {
           const customStartDate = new Date(startDate);
