@@ -49,7 +49,8 @@ const Visitor = () => {
     try {
       while (currentPageUrl) {
         const { data } = await axios.get(
-          `${currentPageUrl}&access_token=${accessToken}&appsecret_proof=${appSecretProof}`
+          ``
+          // `${currentPageUrl}&access_token=${accessToken}&appsecret_proof=${appSecretProof}`
         );
         setLoading(false);
         if (data.data) {
