@@ -81,7 +81,10 @@ const SelectInputs = ({
   useEffect(() => {
     if (name !== "lead") return; // Only run the effect if the name is "lead"
 
-    if (search === "") return; // Prevent fetching if search is empty
+    if (search === "") {
+      setCurrentPage(0);
+      return;
+    }; // Prevent fetching if search is empty
 
     // API call when search value or page changes
     const fetchDataFromAPI = async () => {
@@ -99,6 +102,9 @@ const SelectInputs = ({
 
         // Call the function passed in props to update data (setMongoData should be passed to parent)
         setMongoData(response.data);
+        setCampaignDetails(response.data.leads); // Store only the leads array
+        setCurrentPage(response.data.currentPage - 1); // Adjust for 0-based index in state
+        setTotalPages(response.data.totalPages);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }

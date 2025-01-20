@@ -93,7 +93,12 @@ const Campaign = () => {
         }
 
         currentPageUrl = data.paging?.next || null; // Get the next page URL, if available
+
+        if (currentPageUrl) {
+          await new Promise(resolve => setTimeout(resolve, 86400000)); // 1 minute delay
+        }
       }
+
 
       return allData;
     } catch (error) {

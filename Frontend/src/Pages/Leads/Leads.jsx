@@ -42,8 +42,8 @@ const Leads = () => {
 
   //
 
-  const [startDate, setStartDate] = useState(""); // State for custom start date
-  const [endDate, setEndDate] = useState(""); // State for custom end date
+  const [startDate, setStartDate] = useState(""); 
+  const [endDate, setEndDate] = useState(""); 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
   const { appsecret_proof, access_token, selectedAccount } =
@@ -57,7 +57,7 @@ const Leads = () => {
     try {
       const campaignsWithAccountId = campaignData.map((campaign) => ({
         ...campaign,
-        account_id: selectedAccount?.id || null, // Add accountId from selectedAccount context
+        account_id: selectedAccount?.id || null, 
       }));
 
       const saveResponse = await axios.post(
@@ -92,12 +92,12 @@ const Leads = () => {
         setLoading(false);
         if (data.data) {
           // Directly save all fetched campaign data to MongoDB
-          await saveCampaignData(data.data); // Save all campaigns from this page
+          await saveCampaignData(data.data); 
 
-          allData = [...allData, ...data.data]; // Add campaigns to the array
+          allData = [...allData, ...data.data]; 
         }
 
-        currentPageUrl = data.paging?.next || null; // Get the next page URL, if available
+        currentPageUrl = data.paging?.next || null; 
       }
 
       return allData;
@@ -163,11 +163,11 @@ const Leads = () => {
   };
 
   const filterData = (data, searchQuery) => {
-    if (!searchQuery) return data; // Return all data if no search query
+    if (!searchQuery) return data; 
  
  
 
-    const searchTerm = searchQuery.toLowerCase(); // Convert search term to lowercase once
+    const searchTerm = searchQuery.toLowerCase(); 
 
     return data.filter((row) => {
     
@@ -185,10 +185,10 @@ const Leads = () => {
     });
   };
 
-  // Calculate total pages based on data length and rows per page
+  
   const totalCount = campaignDetails.length;
 
-  // Update paginated details when currentPage, rowsPerPage, or campaignDetails change
+  
   const updatePaginatedDetails = () => {
     const startIndex = currentPage * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -197,34 +197,34 @@ const Leads = () => {
   };
 
   useEffect(() => {
-    // Handle invalid currentPage or empty data
+    
     if (currentPage >= totalPages) {
-      setCurrentPage(totalPages - 1); // Reset to the last page
+      setCurrentPage(totalPages - 1); 
     }
 
     if (campaignDetails.length > 0 && currentPage < totalPages) {
       updatePaginatedDetails();
     } else {
-      setCurrentPage(0); // Reset to the first page if no data
+      setCurrentPage(0); 
       updatePaginatedDetails();
     }
   }, [currentPage, rowsPerPage, campaignDetails, totalPages]);
 
-  // Handle navigation to the next page
+  
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
-  // Handle navigation to the previous page
+  
   const handlePreviousPage = () => {
     if (currentPage > 0) {
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
 
-  // Determine if pagination buttons should be disabled
+  
   const isNextButtonDisabled = currentPage >= totalPages - 1;
   const isPrevButtonDisabled = currentPage <= 0;
 
@@ -245,9 +245,9 @@ const Leads = () => {
         });
 
         if (response.data.leads) {
-          setMongoData(response.data); // Store the full response for debugging or future use
-          setCampaignDetails(response.data.leads); // Store only the leads array
-          setCurrentPage(response.data.currentPage - 1); // Adjust for 0-based index in state
+          setMongoData(response.data); 
+          setCampaignDetails(response.data.leads); 
+          setCurrentPage(response.data.currentPage - 1); 
           setTotalPages(response.data.totalPages);
         } else {
           console.error("No leads found in the response");
@@ -257,8 +257,8 @@ const Leads = () => {
       }
     };
 
-    fetchCampaigns();  // Trigger fetch when the component loads or dependencies change
-  }, [currentPage, rowsPerPage, startDate, endDate]);  // Dependencies for refetching data
+    fetchCampaigns();  
+  }, [currentPage, rowsPerPage, startDate, endDate]);  
 
 
   const handleRowsPerPageChange = (event) => {
@@ -303,7 +303,7 @@ const Leads = () => {
 
         filteredData = details.filter((detail) => {
           const createdDate = detail.createdOn ? new Date(detail.createdOn) : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0); // Normalize to start of the day
+          if (createdDate) createdDate.setHours(0, 0, 0, 0); 
           return createdDate && createdDate >= last7Days;
         });
         break;
@@ -316,7 +316,7 @@ const Leads = () => {
 
         filteredData = details.filter((detail) => {
           const createdDate = detail.createdOn ? new Date(detail.createdOn) : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0); // Normalize
+          if (createdDate) createdDate.setHours(0, 0, 0, 0); 
           return createdDate && createdDate >= last14Days;
         });
         break;
@@ -338,7 +338,7 @@ const Leads = () => {
       }
 
       default:
-        filteredData = details; // No filtering for "all-time" or invalid preset
+        filteredData = details; 
         break;
     }
 
@@ -350,17 +350,17 @@ const Leads = () => {
   const getFilteredData = () => {
     let dataToFilter = [];
   
-    // Always start with the full dataset
+    
     if (Array.isArray(mongoData?.leads) && mongoData?.leads.length > 0) {
       dataToFilter = mongoData.leads;
     } else if (Array.isArray(mydata) && mydata.length > 0) {
       dataToFilter = mydata;
     }
   
-    // Apply search filter to the full dataset
+    
     const searchFilteredData = filterData(dataToFilter, search);
   
-    // Apply date filter on the search results
+    
     const finalFilteredData = filterByDate(
       searchFilteredData,
       datePreset,
