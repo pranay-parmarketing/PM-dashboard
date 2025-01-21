@@ -149,7 +149,8 @@ const Ads = () => {
     ? mongoData[0].data.filter(
         (row) =>
           (row.name && row.name.toLowerCase().includes(search.toLowerCase())) ||
-          (row.id && row.id.toLowerCase().includes(search.toLowerCase()))
+          (row.id && row.id.toLowerCase().includes(search.toLowerCase()))||
+          (row.adset?.name && row.adset?.name.toLowerCase().includes(search.toLowerCase()))
       )
     : []; // Return an empty array if mongoData[0].data is not an array
 

@@ -15,27 +15,25 @@ const utmRoutes = require('./routes/utmRoutes.js');
 const authtokenRoutes = require('./routes/authtoken.js'); 
 // 
 const leadsRoute = require('./routes/leadsRoute.js'); 
+const dmpRoute = require('./routes/dmpRoute.js'); 
 
 
 const app = express();
 
 app.use(express.json());
 
-// Middleware
 const corsOptions = {
-  origin: 'http://localhost:3000', // frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // allowed headers
-  preflightContinue: false, // Send response for preflight requests automatically
+  origin: 'http://localhost:3000', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+  preflightContinue: false,
 };
 
-// Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Database Connection
 connectDB();
 
-// Routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/authtoken', authtokenRoutes);
 app.use('/api/account', accountRoutes); 
@@ -50,47 +48,12 @@ app.use('/api', utmRoutes);
 // 
 
 app.use('/api/leads',leadsRoute)
+app.use('/api/dmp',dmpRoute)
 
-
-// 
-// app.get('/custom-proxy', async (req, res) => {
-//   const { url } = req.query;
-//   const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
-
-//   if (!token) {
-//     return res.status(400).send('Authorization token is missing');
-//   }
-
-//   try {
-//     const response = await fetch(url, {
-//       headers: {
-//         Authorization: `Zoho-oauthtoken ${token}`, // Use the dynamic token
-//       },
-//     });
-
-//     // Check if the response has content
-//     if (!response.ok) {
-//       return res.status(response.status).send(`Error fetching data: ${response.statusText}`);
-//     }
-
-//     const text = await response.text(); // Read as text first
-//     if (text.trim() === '') {
-//       return res.status(204).send('No content in response');
-//     }
-
-//     const data = JSON.parse(text); // Parse only if text is non-empty
-//     res.json(data);
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).send('Proxy error');
-//   }
-// });
-
-// 
 const fetch = require('node-fetch');
 const NodeCache = require('node-cache');
 
-const cache = new NodeCache({ stdTTL: 86400 }); // Cache TTL: 24 hours (86400 seconds)
+const cache = new NodeCache({ stdTTL: 86400 }); 
 
 app.get('/custom-proxy', async (req, res) => {
   const { url } = req.query;
@@ -108,12 +71,12 @@ app.get('/custom-proxy', async (req, res) => {
   const cachedData = cache.get(cacheKey);
 
   if (cachedData) {
-    return res.json(cachedData); // Return cached data if available
+    return res.json(cachedData); 
   }
 
   try {
     let allData = [];
-    let nextPageUrl = url; // Start with the initial URL passed in query params
+    let nextPageUrl = url; 
 
     while (nextPageUrl) {
       const response = await fetch(nextPageUrl, {
@@ -127,15 +90,14 @@ app.get('/custom-proxy', async (req, res) => {
       const data = await response.json();
 
       if (data.data) {
-        allData = [...allData, ...data.data]; // Accumulate data from all pages
+        allData = [...allData, ...data.data]; 
       }
 
-      // Get the next page URL, if available
       nextPageUrl = data.info?.more_records ? data.info?.next_page_url : null;
     }
 
-    cache.set(cacheKey, allData); // Cache the entire data
-    res.json(allData); // Return the full data after pagination is done
+    cache.set(cacheKey, allData); 
+    res.json(allData); 
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Proxy error');

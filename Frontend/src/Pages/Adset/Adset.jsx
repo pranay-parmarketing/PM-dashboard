@@ -145,7 +145,8 @@ const Adset = () => {
     ? mongoData.filter(
         (row) =>
           (row.name && row.name.toLowerCase().includes(search.toLowerCase())) ||
-          (row.id && row.id.toLowerCase().includes(search.toLowerCase()))
+          (row.id && row.id.toLowerCase().includes(search.toLowerCase()))||
+          (row.campaign_name && row.campaign_name.toLowerCase().includes(search.toLowerCase()))
       )
     : []; // Return an empty array if mongoData is not an array
 
