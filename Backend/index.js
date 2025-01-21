@@ -121,6 +121,10 @@ app.get('/clear-cache', (req, res) => {
   res.send('All cache cleared.');
 });
 
+app.get("/test", (req,res) => {
+  res.send("PM Dashboard")
+})
+
 
 
 // Server
