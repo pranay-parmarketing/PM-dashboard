@@ -47,7 +47,7 @@ app.use('/api', utmRoutes);
 
 // 
 
-app.use('/leads',leadsRoute)
+app.use('/api/leads',leadsRoute)
 app.use('/api/dmp',dmpRoute)
 
 const fetch = require('node-fetch');
