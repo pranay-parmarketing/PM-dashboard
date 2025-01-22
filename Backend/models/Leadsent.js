@@ -40,7 +40,7 @@ const leadsentSchema = new mongoose.Schema({
     trim: true,
   },
   update: {
-    type: Date,
+    type: String,
   },
   created_at: {
     type: Date,
