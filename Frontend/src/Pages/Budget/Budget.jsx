@@ -345,7 +345,6 @@ const Budget = () => {
             `${MONGO_URI}/api/save-budget/${id}`
           );
 
-        
           if (response?.data.length > 0) {
             campaignData.push(...response?.data);
           } else {
@@ -474,7 +473,7 @@ const Budget = () => {
                           {detail.name}
                         </td>
 
-                        <td data-label="Total Budget" className="px-4 py-2">
+                        {/* <td data-label="Total Budget" className="px-4 py-2">
                           {detail?.adsets?.data?.[0]?.campaign?.daily_budget
                             ? parseInt(
                                 detail.adsets.data[0].campaign.daily_budget,
@@ -485,6 +484,30 @@ const Budget = () => {
                             ? detail?.adsets?.data.reduce((total, adset) => {
                                 const budget =
                                   parseInt(adset?.daily_budget, 10) || 0; // Use a fallback value if `daily_budget` is undefined
+                                return total + budget;
+                              }, 0) / 100 // Divide by 100 if needed
+                            : "Data not available"}
+                        </td> */}
+
+                        <td data-label="Total Budget" className="px-4 py-2">
+                          {detail?.adsets?.data?.[0]?.campaign?.daily_budget
+                            ? parseInt(
+                                detail.adsets.data[0].campaign.daily_budget,
+                                10
+                              ) / 100
+                            : detail?.adsets?.data?.[0]?.campaign
+                                ?.lifetime_budget
+                            ? parseInt(
+                                detail.adsets.data[0].campaign.lifetime_budget,
+                                10
+                              ) / 100
+                            : Array.isArray(detail?.adsets?.data) &&
+                              detail?.adsets?.data.length > 0
+                            ? detail?.adsets?.data.reduce((total, adset) => {
+                                const budget =
+                                  parseInt(adset?.daily_budget, 10) ||
+                                  parseInt(adset?.lifetime_budget, 10) ||
+                                  0; // Use lifetime_budget if daily_budget is undefined
                                 return total + budget;
                               }, 0) / 100 // Divide by 100 if needed
                             : "Data not available"}

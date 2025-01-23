@@ -13,16 +13,12 @@ import Pagination from "../../Components/Pagination/Pagination";
 import DetailsModal from "../../Components/CustomModal/DetailsModal";
 
 const Expense = () => {
-  const [mydata, setData1] = useState([]);
   const { appsecret_proof, access_token, selectedAccount } =
     useContext(ApiTokenContext);
-  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [allIds, setAllIds] = useState([]);
   const [campaignDetails, setCampaignDetails] = useState([]);
-  const [nextPage, setNextPage] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(25);
   const [paginatedDetails, setPaginatedDetails] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -71,9 +67,6 @@ const Expense = () => {
         const finalUrl = `${currentUrl}`;
         const response = await fetch(finalUrl);
         const result = await response.json();
-      
-
-      
 
         if (result) {
           const newIds = result?.map((item) => item.id);
@@ -91,8 +84,6 @@ const Expense = () => {
       setLoading(false);
     }
   };
-
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const fetchDetailsForIds = async () => {
     setLoading(true);
@@ -152,7 +143,6 @@ const Expense = () => {
     }
     return null;
   };
-
 
   useEffect(() => {
     if (selectedAccount) {
@@ -339,7 +329,6 @@ const Expense = () => {
             `${MONGO_URI}/api/save-expense/${id}`
           );
 
-        
           if (response?.data.length > 0) {
             campaignData.push(...response?.data);
           } else {
@@ -459,7 +448,6 @@ const Expense = () => {
                           {/* Format the date */}
                           {detail.name}
                         </td>
-
 
                         {/* work on this addition of all spend  */}
                         <td data-label="Total Budget" className="px-4 py-2">

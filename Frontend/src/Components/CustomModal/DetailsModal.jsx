@@ -49,15 +49,12 @@ const DetailsModal = ({
     []
   );
 
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={selected ? `View ${Name}` : `Add ${Name}`}
     >
-     
-
       {Name === "Budget" ? (
         <>
           {selected ? (
@@ -100,55 +97,54 @@ const DetailsModal = ({
 
       {Name === "Expense" ? (
         <>
-         <div className="overflow-x-auto w-full">
-  <table className="table-auto w-full">
-    <thead>
-      <tr className="bg-gray-800 text-white text-left">
-        <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
-          Ads Name
-        </th>
-        <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
-          Adset Name
-        </th>
-        <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
-          Campaign Name
-        </th>
-        <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
-          Status
-        </th>
-        <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
-          Expense
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {selected?.adsets?.data.map((adset, index) =>
-        adset?.ads?.data.map((ad, adIndex) => (
-          <tr key={`${index}-${adIndex}`} className="text-center">
-            <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
-              {ad.name}
-            </td>
-            <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
-              {adset.name}
-            </td>
-            <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
-              {adset.campaign.name}
-            </td>
-            <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
-              {adset.status}
-            </td>
-            <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
-              {adset.insights?.data.length > 0
-                ? Math.ceil(adset.insights.data[0].spend)
-                : "N/A"}
-            </td>
-          </tr>
-        ))
-      )}
-    </tbody>
-  </table>
-</div>
-
+          <div className="overflow-x-auto w-full">
+            <table className="table-auto w-full">
+              <thead>
+                <tr className="bg-gray-800 text-white text-left">
+                  <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
+                    Ads Name
+                  </th>
+                  <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
+                    Adset Name
+                  </th>
+                  <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
+                    Campaign Name
+                  </th>
+                  <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="border border-gray-400 px-4 py-2 whitespace-nowrap">
+                    Expense
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {selected?.adsets?.data.map((adset, index) =>
+                  adset?.ads?.data.map((ad, adIndex) => (
+                    <tr key={`${index}-${adIndex}`} className="text-center">
+                      <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
+                        {ad.name}
+                      </td>
+                      <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
+                        {adset.name}
+                      </td>
+                      <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
+                        {adset.campaign.name}
+                      </td>
+                      <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
+                        {adset.status}
+                      </td>
+                      <td className="border border-gray-400 px-2 py-1 text-sm sm:px-4 sm:py-2 sm:text-base truncate">
+                        {adset.insights?.data.length > 0
+                          ? Math.ceil(adset.insights.data[0].spend)
+                          : "N/A"}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </>
       ) : null}
     </Modal>
