@@ -138,29 +138,13 @@ const createDmpData = async (req, res) => {
       const sheetName = workbook.SheetNames[0]; // Get the first sheet
       let sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-      // Process sheet data and parse dates
+      // Parse dates for fields in the schema
       sheetData = sheetData.map((row) => {
-        if (row.date && !isNaN(new Date(row.date))) {
-          row.date = new Date(row.date).toISOString().split("T")[0]; // Format date
-        }
-        if (row.lead_date && !isNaN(new Date(row.lead_date))) {
-          row.lead_date = new Date(row.lead_date).toISOString().split("T")[0];
-        }
-        if (row.follow_up_date && !isNaN(new Date(row.follow_up_date))) {
-          row.follow_up_date = new Date(row.follow_up_date).toISOString().split("T")[0];
-        }
-        if (row.update && !isNaN(new Date(row.update))) {
-          row.update = new Date(row.update).toISOString();
-        }
-        if (row.created_at && !isNaN(new Date(row.created_at))) {
-          row.created_at = new Date(row.created_at).toISOString();
-        }
-        if (row.updated_at && !isNaN(new Date(row.updated_at))) {
-          row.updated_at = new Date(row.updated_at).toISOString();
-        }
-        if (row.deleted_at && !isNaN(new Date(row.deleted_at))) {
-          row.deleted_at = new Date(row.deleted_at).toISOString();
-        }
+        ["call_start_time", "call_end_time"].forEach((key) => {
+          if (row[key] && !isNaN(new Date(row[key]))) {
+            row[key] = new Date(row[key]);
+          }
+        });
         return row;
       });
 
@@ -197,19 +181,23 @@ const createDmpData = async (req, res) => {
         filter: { phone: String(dmp.phone).trim() },
         update: {
           $setOnInsert: {
-            lead_date: dmp.lead_date ? new Date(dmp.lead_date) : null,
-            date: dmp.date ? new Date(dmp.date) : null,
+            cust_name: dmp.cust_name,
             phone: String(dmp.phone).trim(),
-            lead_id: dmp.lead_id,
-            team: dmp.team,
-            transfer_to: dmp.transfer_to,
-            lvt_agent: dmp.lvt_agent,
-            follow_up_date: dmp.follow_up_date ? new Date(dmp.follow_up_date) : null,
-            source_raw: dmp.source_raw,
-            update: dmp.update ? new Date(dmp.update) : null,
-            created_at: dmp.created_at ? new Date(dmp.created_at) : null,
-            updated_at: dmp.updated_at ? new Date(dmp.updated_at) : null,
-            deleted_at: dmp.deleted_at ? new Date(dmp.deleted_at) : null,
+            email: dmp.email,
+            agent_id: dmp.agent_id,
+            agent_username: dmp.agent_username,
+            agent_name: dmp.agent_name,
+            campaign_id: dmp.campaign_id,
+            campaign_name: dmp.campaign_name,
+            process_name: dmp.process_name,
+            process_id: dmp.process_id,
+            first_disposition: dmp.first_disposition,
+            second_disposition: dmp.second_disposition,
+            call_start_time: dmp.call_start_time ? new Date(dmp.call_start_time) : null,
+            call_end_time: dmp.call_end_time ? new Date(dmp.call_end_time) : null,
+            record_url: dmp.record_url,
+            call_type: dmp.call_type,
+            source: dmp.source,
           },
         },
         upsert: true, // Insert if not found
@@ -237,36 +225,96 @@ const createDmpData = async (req, res) => {
 
 
 
+
+// const getDmpData = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const pageSize = parseInt(req.query.pageSize) || 10;
+//     const search = req.query.search || "";
+//     const startDate = req.query.startDate ? req.query.startDate : null;
+//     const endDate = req.query.endDate ? req.query.endDate : null;
+//     const sortBy = req.query.sortBy || "date";
+//     const sortDirection = req.query.sortDirection || "desc";
+//     const sortOrder = sortDirection === "asc" ? 1 : -1;
+
+   
+//     if (page <= 0 || pageSize <= 0) {
+//       return res.status(400).json({ error: "Invalid pagination parameters" });
+//     }
+
+//     const skip = (page - 1) * pageSize;
+
+   
+//     const searchFilter = search
+//       ? {
+//           $or: [
+//             { phone: { $regex: search, $options: "i" } },
+//             { source: { $regex: search, $options: "i" } },
+//             { agent: { $regex: search, $options: "i" } },
+//           ],
+//         }
+//       : {};
+
+  
+//     if (startDate && endDate) {
+//       searchFilter.date = {
+//         $gte: startDate,
+//         $lte: endDate,
+//       };
+//     }
+
+//     console.log("Search Filter:", searchFilter);
+
+//     const dmps = await Dmp.find(searchFilter)
+//       .sort({ [sortBy]: sortOrder, _id: -1 })
+//       .skip(skip)
+//       .limit(pageSize);
+
+//     const totalDmps = await Dmp.countDocuments(searchFilter);
+//     const totalPages = Math.ceil(totalDmps / pageSize);
+
+//     res.status(200).json({
+//       dmps,
+//       currentPage: page,
+//       totalPages,
+//       totalDmps,
+//     });
+//   } catch (error) {
+//     console.error("Error occurred while fetching DMP data:", error);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+
 const getDmpData = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const search = req.query.search || "";
-    const startDate = req.query.startDate ? req.query.startDate : null;
-    const endDate = req.query.endDate ? req.query.endDate : null;
+    const startDate = req.query.startDate || null;
+    const endDate = req.query.endDate || null;
     const sortBy = req.query.sortBy || "date";
     const sortDirection = req.query.sortDirection || "desc";
     const sortOrder = sortDirection === "asc" ? 1 : -1;
 
-   
     if (page <= 0 || pageSize <= 0) {
       return res.status(400).json({ error: "Invalid pagination parameters" });
     }
 
     const skip = (page - 1) * pageSize;
 
-   
+    // Build search filter
     const searchFilter = search
       ? {
           $or: [
             { phone: { $regex: search, $options: "i" } },
             { source: { $regex: search, $options: "i" } },
-            { agent: { $regex: search, $options: "i" } },
+            { agent_username: { $regex: search, $options: "i" } },
+            { cust_name: { $regex: search, $options: "i" } },
           ],
         }
       : {};
 
-  
     if (startDate && endDate) {
       searchFilter.date = {
         $gte: startDate,
@@ -274,14 +322,19 @@ const getDmpData = async (req, res) => {
       };
     }
 
-    console.log("Search Filter:", searchFilter);
+    // Debug: log the search filter
+    console.log("Search Filter:", JSON.stringify(searchFilter, null, 2));
 
+    // Query the database
     const dmps = await Dmp.find(searchFilter)
       .sort({ [sortBy]: sortOrder, _id: -1 })
       .skip(skip)
       .limit(pageSize);
 
+    // Log the result count
     const totalDmps = await Dmp.countDocuments(searchFilter);
+    console.log("Total DMPs matching filter:", totalDmps);
+
     const totalPages = Math.ceil(totalDmps / pageSize);
 
     res.status(200).json({
@@ -295,6 +348,7 @@ const getDmpData = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 
 

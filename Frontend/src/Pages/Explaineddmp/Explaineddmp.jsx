@@ -60,7 +60,7 @@ const Explaineddmp = () => {
       }));
 
       const saveResponse = await axios.post(
-        `${MONGO_URI}/api/leads`,
+        `${MONGO_URI}/api/dmp`,
         campaignsWithAccountId,
         {
           headers: {
@@ -168,15 +168,10 @@ const Explaineddmp = () => {
 
     return data.filter((row) => {
       return (
-        (row.name && row.name.toLowerCase().includes(searchTerm)) ||
-        (row._id && row._id.toLowerCase().includes(searchTerm)) ||
-        (row.brand && row.brand.toLowerCase().includes(searchTerm)) ||
-        (row.city && row.city.toLowerCase().includes(searchTerm)) ||
         (row.phone && row.phone.toLowerCase().includes(searchTerm)) ||
-        (row.email && row.email.toLowerCase().includes(searchTerm)) ||
         (row.source && row.source.toLowerCase().includes(searchTerm)) ||
-        (row.brand && row.brand.toLowerCase().includes(searchTerm)) ||
-        (row.createdOn && row.createdOn.toLowerCase().includes(searchTerm))
+        (row.cust_name && row.cust_name.toLowerCase().includes(searchTerm)) ||
+        (row.agent_username && row.agent_username.toLowerCase().includes(searchTerm)) 
       );
     });
   };
@@ -238,10 +233,10 @@ const Explaineddmp = () => {
           setCurrentPage(response.data.currentPage - 1);
           setTotalPages(response.data.totalPages);
         } else {
-          console.error("No leads found in the response");
+          console.error("No dmp found in the response");
         }
       } catch (error) {
-        console.error("Error fetching leads data:", error);
+        console.error("Error fetching dmp data:", error);
       }
     };
 
@@ -263,11 +258,8 @@ const Explaineddmp = () => {
   const closeModal = () => setIsModalOpen(false);
   const openModal = () => setIsModalOpen(true);
 
-
   const openExportModal = () => setIsExportModalOpen(true); // Open modal
   const closeExportModal = () => setIsExportModalOpen(false); // Close modal
-
-
 
   const handleApplyFilters = (newFilters) => {
     setFilters(newFilters);
@@ -424,13 +416,13 @@ const Explaineddmp = () => {
   return (
     <div className="home">
       <ChooseFileModal
-        Name={"Leads"}
+        Name={"Dmp"}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onFileChange={handleFileChange}
         onFileSave={handleFileSave}
         errorMessage={error}
-        apiEndpoint={`${MONGO_URI}/api/leads`}
+        apiEndpoint={`${MONGO_URI}/api/dmp`}
       />
 
       <FilterModal
@@ -491,7 +483,7 @@ const Explaineddmp = () => {
           }`}
         >
           <SelectInputs
-            name="lead"
+            name="dmp"
             rowsPerPage={rowsPerPage}
             setSearch={setSearch}
             search={search}
@@ -503,121 +495,89 @@ const Explaineddmp = () => {
           />
 
           <div className="overflow-x-auto">
-            {/* <table className="min-w-max table-auto">
+            <table className="min-w-max table-auto">
               <thead>
                 <tr className="bg-gray-800 text-white text-left">
                   <th>#</th>
-                  <th>Name</th>
-                  <th>Email</th>
+                  <th>Customer Name</th>
                   <th>Phone</th>
-                  <th>City</th>
-                  <th>Brand</th>
+                  <th>Email</th>
+                  <th>Agent ID</th>
+                  <th>Agent Username</th>
+                  <th>Agent Name</th>
+                  <th>Campaign ID</th>
+                  <th>Campaign Name</th>
+                  <th>Process Name</th>
+                  <th>Process ID</th>
+                  <th>First Disposition</th>
+                  <th>Second Disposition</th>
+                  <th>Call Start Time</th>
+                  <th>Call End Time</th>
+                  <th>Record URL</th>
+                  <th>Call Type</th>
                   <th>Source</th>
-                  <th>Created On</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="text-center py-4">
+                    <td colSpan="18" className="text-center py-4">
                       Loading...
                     </td>
                   </tr>
                 ) : Array.isArray(filteredData) && filteredData.length > 0 ? (
                   filteredData.map((row, index) => (
                     <tr key={row._id}>
-                      {" "}
-                      <td data-label="#">
-                        {" "}
-                        {index + 1 + currentPage * rowsPerPage}{" "}
-                      </td>
-                      <td data-label="Name"> {row.name || "N/A"} </td>
-                      <td data-label="Email"> {row.email || "N/A"} </td>
-                      <td data-label="Phone"> {row.phone || "N/A"} </td>
-                      <td data-label="City"> {row.city || "N/A"} </td>
-                      <td data-label="Brand"> {row.brand || "N/A"} </td>
-                      <td data-label="Source"> {row.source || "N/A"} </td>
-                      <td data-label="Created On">
-                        {row.createdOn
-                          ? new Date(row.createdOn).toLocaleDateString()
+                      <td>{index + 1 + currentPage * rowsPerPage}</td>
+                      <td>{row.cust_name || "N/A"}</td>
+                      <td>{row.phone || "N/A"}</td>
+                      <td>{row.email || "N/A"}</td>
+                      <td>{row.agent_id || "N/A"}</td>
+                      <td>{row.agent_username || "N/A"}</td>
+                      <td>{row.agent_name || "N/A"}</td>
+                      <td>{row.campaign_id || "N/A"}</td>
+                      <td>{row.campaign_name || "N/A"}</td>
+                      <td>{row.process_name || "N/A"}</td>
+                      <td>{row.process_id || "N/A"}</td>
+                      <td>{row.first_disposition || "N/A"}</td>
+                      <td>{row.second_disposition || "N/A"}</td>
+                      <td>
+                        {row.call_start_time
+                          ? new Date(row.call_start_time).toLocaleString()
                           : "N/A"}
                       </td>
+                      <td>
+                        {row.call_end_time
+                          ? new Date(row.call_end_time).toLocaleString()
+                          : "N/A"}
+                      </td>
+                      <td>
+                        {row.record_url ? (
+                          <a
+                            href={row.record_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                          >
+                            Recording
+                          </a>
+                        ) : (
+                          "N/A"
+                        )}
+                      </td>
+                      <td>{row.call_type || "N/A"}</td>
+                      <td>{row.source || "N/A"}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-4">
+                    <td colSpan="18" className="text-center py-4">
                       No data available
                     </td>
                   </tr>
                 )}
               </tbody>
-            </table> */}
-            <table className="min-w-max table-auto">
-  <thead>
-    <tr className="bg-gray-800 text-white text-left">
-      <th>#</th>
-      <th>Phone</th>
-      <th>Lead ID</th>
-      <th>Agent</th>
-      <th>Source</th>
-      <th>Team</th>
-      <th>Transfer To</th>
-      <th>Created On</th>
-      <th>Follow-up Date</th>
-      <th>Lead Date</th>
-      <th>Updated On</th>
-    </tr>
-  </thead>
-  <tbody className="text-gray-700">
-    {loading ? (
-      <tr>
-        <td colSpan="11" className="text-center py-4">
-          Loading...
-        </td>
-      </tr>
-    ) : Array.isArray(filteredData) && filteredData.length > 0 ? (
-      filteredData.map((row, index) => (
-        <tr key={row._id}>
-          <td data-label="#"> {index + 1 + currentPage * rowsPerPage} </td>
-          <td data-label="Phone"> {row.phone || "N/A"} </td>
-          <td data-label="Lead ID"> {row.lead_id || "N/A"} </td>
-          <td data-label="Agent"> {row.lvt_agent || "N/A"} </td>
-          <td data-label="Source"> {row.source_raw || "N/A"} </td>
-          <td data-label="Team"> {row.team || "N/A"} </td>
-          <td data-label="Transfer To"> {row.transfer_to || "N/A"} </td>
-          <td data-label="Created On">
-            {row.created_at
-              ? new Date(row.created_at).toLocaleDateString()
-              : "N/A"}
-          </td>
-          <td data-label="Follow-up Date">
-            {row.follow_up_date
-              ? new Date(row.follow_up_date).toLocaleDateString()
-              : "N/A"}
-          </td>
-          <td data-label="Lead Date">
-            {row.lead_date
-              ? new Date(row.lead_date).toLocaleDateString()
-              : "N/A"}
-          </td>
-          <td data-label="Updated On">
-            {row.updated_at
-              ? new Date(row.updated_at).toLocaleDateString()
-              : "N/A"}
-          </td>
-        </tr>
-      ))
-    ) : (
-      <tr>
-        <td colSpan="11" className="text-center py-4">
-          No data available
-        </td>
-      </tr>
-    )}
-  </tbody>
-</table>
-
+            </table>
           </div>
 
           <Pagination
