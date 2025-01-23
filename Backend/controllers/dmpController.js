@@ -311,6 +311,7 @@ const getDmpData = async (req, res) => {
             { source: { $regex: search, $options: "i" } },
             { agent_username: { $regex: search, $options: "i" } },
             { cust_name: { $regex: search, $options: "i" } },
+            { first_disposition: { $regex: search, $options: "i" } },
           ],
         }
       : {};

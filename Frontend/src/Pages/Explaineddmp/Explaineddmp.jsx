@@ -171,6 +171,7 @@ const Explaineddmp = () => {
         (row.phone && row.phone.toLowerCase().includes(searchTerm)) ||
         (row.source && row.source.toLowerCase().includes(searchTerm)) ||
         (row.cust_name && row.cust_name.toLowerCase().includes(searchTerm)) ||
+        (row.first_disposition && row.first_disposition.toLowerCase().includes(searchTerm)) ||
         (row.agent_username && row.agent_username.toLowerCase().includes(searchTerm)) 
       );
     });
