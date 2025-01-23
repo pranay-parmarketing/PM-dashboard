@@ -221,7 +221,7 @@ const Explaineddmp = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const response = await axios.get(`${MONGO_URI}/api/leads`, {
+        const response = await axios.get(`${MONGO_URI}/api/dmp`, {
           params: {
             page: currentPage + 1,
             pageSize: rowsPerPage,
@@ -232,9 +232,9 @@ const Explaineddmp = () => {
           },
         });
 
-        if (response.data.leads) {
+        if (response.data.dmps) {
           setMongoData(response.data);
-          setCampaignDetails(response.data.leads);
+          setCampaignDetails(response.data.dmps);
           setCurrentPage(response.data.currentPage - 1);
           setTotalPages(response.data.totalPages);
         } else {
@@ -396,8 +396,8 @@ const Explaineddmp = () => {
   const getFilteredData = () => {
     let dataToFilter = [];
 
-    if (Array.isArray(mongoData?.leads) && mongoData?.leads.length > 0) {
-      dataToFilter = mongoData.leads;
+    if (Array.isArray(mongoData?.dmps) && mongoData?.dmps.length > 0) {
+      dataToFilter = mongoData.dmps;
     } else if (Array.isArray(mydata) && mydata.length > 0) {
       dataToFilter = mydata;
     }
@@ -456,7 +456,7 @@ const Explaineddmp = () => {
       <div className="homeContainer">
         <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
           <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
-            Leads
+            DMP
           </h1>
           <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
             <button
@@ -464,7 +464,7 @@ const Explaineddmp = () => {
               onClick={() => setIsAddModalOpen(true)}
             >
               <MdFileUpload className="mr-2 my-3" />
-              <span className="btn-text">Import Leads</span>
+              <span className="btn-text">Import DMP</span>
             </button>
 
             <button
@@ -503,7 +503,7 @@ const Explaineddmp = () => {
           />
 
           <div className="overflow-x-auto">
-            <table className="min-w-max table-auto">
+            {/* <table className="min-w-max table-auto">
               <thead>
                 <tr className="bg-gray-800 text-white text-left">
                   <th>#</th>
@@ -552,7 +552,72 @@ const Explaineddmp = () => {
                   </tr>
                 )}
               </tbody>
-            </table>
+            </table> */}
+            <table className="min-w-max table-auto">
+  <thead>
+    <tr className="bg-gray-800 text-white text-left">
+      <th>#</th>
+      <th>Phone</th>
+      <th>Lead ID</th>
+      <th>Agent</th>
+      <th>Source</th>
+      <th>Team</th>
+      <th>Transfer To</th>
+      <th>Created On</th>
+      <th>Follow-up Date</th>
+      <th>Lead Date</th>
+      <th>Updated On</th>
+    </tr>
+  </thead>
+  <tbody className="text-gray-700">
+    {loading ? (
+      <tr>
+        <td colSpan="11" className="text-center py-4">
+          Loading...
+        </td>
+      </tr>
+    ) : Array.isArray(filteredData) && filteredData.length > 0 ? (
+      filteredData.map((row, index) => (
+        <tr key={row._id}>
+          <td data-label="#"> {index + 1 + currentPage * rowsPerPage} </td>
+          <td data-label="Phone"> {row.phone || "N/A"} </td>
+          <td data-label="Lead ID"> {row.lead_id || "N/A"} </td>
+          <td data-label="Agent"> {row.lvt_agent || "N/A"} </td>
+          <td data-label="Source"> {row.source_raw || "N/A"} </td>
+          <td data-label="Team"> {row.team || "N/A"} </td>
+          <td data-label="Transfer To"> {row.transfer_to || "N/A"} </td>
+          <td data-label="Created On">
+            {row.created_at
+              ? new Date(row.created_at).toLocaleDateString()
+              : "N/A"}
+          </td>
+          <td data-label="Follow-up Date">
+            {row.follow_up_date
+              ? new Date(row.follow_up_date).toLocaleDateString()
+              : "N/A"}
+          </td>
+          <td data-label="Lead Date">
+            {row.lead_date
+              ? new Date(row.lead_date).toLocaleDateString()
+              : "N/A"}
+          </td>
+          <td data-label="Updated On">
+            {row.updated_at
+              ? new Date(row.updated_at).toLocaleDateString()
+              : "N/A"}
+          </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan="11" className="text-center py-4">
+          No data available
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
+
           </div>
 
           <Pagination
