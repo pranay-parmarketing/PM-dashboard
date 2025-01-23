@@ -1,58 +1,3 @@
-// import React, { useCallback } from "react";
-// import Brands from "../BrandFilter/Brands";
-
-// const SelectInputs = ({
-//   rowsPerPage,
-//   setSearch,
-//   search,
-//   handleRowsPerPageChange,
-//   setCurrentPage,
-//   name,
-// }) => {
-
-//   const handleSearchChange = useCallback(
-//     (e) => {
-//       const value = e.target.value;
-//       setSearch(value);
-//       setCurrentPage(0);
-
-//     },
-//     [setSearch, setCurrentPage]
-//   );
-
-//   return (
-//     <div className="table-header flex justify-between items-center mb-4">
-//       <select
-//         value={rowsPerPage}
-//         onChange={handleRowsPerPageChange}
-//         className="border p-2 rounded-md"
-//       >
-//         <option value={500}>Show 500 entries</option>
-//         <option value={100}>Show 100 entries</option>
-//         <option value={50}>Show 50 entries</option>
-//         <option value={25}>Show 25 entries</option>
-//         <option value={10}>Show 10 entries</option>
-//       </select>
-
-//       {name === "campaign" || name === "adset" || name === "ads" || name === "lead" ? (
-//         <Brands setSearch={setSearch} setCurrentPage={setCurrentPage} />
-//       ) : null}
-
-//       {["campaign", "adset", "ads", "account", "allpayments","lead"].includes(name) && (
-//         <input
-//           type="text"
-//           placeholder="Search..."
-//           value={search}
-//           onChange={handleSearchChange}
-//           className="border border-gray-300 p-2 rounded-md"
-//         />
-//       )}
-//     </div>
-//   );
-// };
-
-// export default SelectInputs;
-
 import React, { useCallback, useEffect } from "react";
 import Brands from "../BrandFilter/Brands";
 import axios from "axios";
@@ -73,37 +18,81 @@ const SelectInputs = ({
     (e) => {
       const value = e.target.value;
       setSearch(value);
-      setCurrentPage(0); // Reset to page 1 when search is modified
+      setCurrentPage(0);
     },
     [setSearch, setCurrentPage]
   );
 
-  useEffect(() => {
-    if (name !== "lead") return; // Only run the effect if the name is "lead"
+  // useEffect(() => {
+  //   if (name !== "lead") return;
 
-    if (search === "") {
+  //   if (search === "") {
+  //     setCurrentPage(0);
+  //     return;
+  //   };
+  //   const fetchDataFromAPI = async () => {
+  //     try {
+  //       const response = await axios.get(`${MONGO_URI}/api/leads`, {
+  //         params: {
+  //           page: 1,
+  //           pageSize: rowsPerPage,
+  //           search: search,
+  //           sortOrder: "asc",
+  //           startDate: null,
+  //           endDate: null,
+  //         },
+  //       });
+
+  //       setMongoData(response.data);
+  //       setCampaignDetails(response.data.leads);
+  //       setCurrentPage(response.data.currentPage - 1);
+  //       setTotalPages(response.data.totalPages);
+  //     } catch (error) {
+  //       console.error("Error fetching data: ", error);
+  //     }
+  //   };
+
+  //   fetchDataFromAPI();
+  // }, [search, rowsPerPage, setCurrentPage, MONGO_URI, name, setMongoData]);
+
+  useEffect(() => {
+    if (name !== "lead" && name !== "dmp") return; // Ensure name is either 'lead' or 'dmp'
+
+    if (search === " ") {
       setCurrentPage(0);
       return;
-    }; // Prevent fetching if search is empty
+    }
 
-    // API call when search value or page changes
     const fetchDataFromAPI = async () => {
       try {
-        const response = await axios.get(`${MONGO_URI}/api/leads`, {
+        let apiEndpoint = "";
+
+        if (name === "lead") {
+          apiEndpoint = `${MONGO_URI}/api/leads`;
+        } else if (name === "dmp") {
+          apiEndpoint = `${MONGO_URI}/api/dmp`;
+        }
+
+        const response = await axios.get(apiEndpoint, {
           params: {
-            page: 1, // Adjust based on your page logic
+            page: 1,
             pageSize: rowsPerPage,
             search: search,
             sortOrder: "asc",
-            startDate: null, // Use your actual start date
-            endDate: null, // Use your actual end date
+            startDate: null,
+            endDate: null,
           },
         });
 
-        // Call the function passed in props to update data (setMongoData should be passed to parent)
         setMongoData(response.data);
-        setCampaignDetails(response.data.leads); // Store only the leads array
-        setCurrentPage(response.data.currentPage - 1); // Adjust for 0-based index in state
+
+        if (name === "lead") {
+          setCampaignDetails(response.data.leads);
+        } else if (name === "dmp") {
+          setCampaignDetails(response.data.dmps);
+        }
+
+        setCurrentPage(response.data.currentPage - 1);
         setTotalPages(response.data.totalPages);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -130,13 +119,20 @@ const SelectInputs = ({
       {name === "campaign" ||
       name === "adset" ||
       name === "ads" ||
+      name === "dmp" ||
       name === "lead" ? (
         <Brands setSearch={setSearch} setCurrentPage={setCurrentPage} />
       ) : null}
 
-      {["campaign", "adset", "ads", "account", "allpayments", "lead"].includes(
-        name
-      ) && (
+      {[
+        "campaign",
+        "adset",
+        "ads",
+        "account",
+        "allpayments",
+        "lead",
+        "dmp",
+      ].includes(name) && (
         <input
           type="text"
           placeholder="Search..."
