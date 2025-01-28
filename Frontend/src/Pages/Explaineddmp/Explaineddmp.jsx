@@ -171,8 +171,10 @@ const Explaineddmp = () => {
         (row.phone && row.phone.toLowerCase().includes(searchTerm)) ||
         (row.source && row.source.toLowerCase().includes(searchTerm)) ||
         (row.cust_name && row.cust_name.toLowerCase().includes(searchTerm)) ||
-        (row.first_disposition && row.first_disposition.toLowerCase().includes(searchTerm)) ||
-        (row.agent_username && row.agent_username.toLowerCase().includes(searchTerm)) 
+        (row.first_disposition &&
+          row.first_disposition.toLowerCase().includes(searchTerm)) ||
+        (row.agent_username &&
+          row.agent_username.toLowerCase().includes(searchTerm))
       );
     });
   };
@@ -441,7 +443,7 @@ const Explaineddmp = () => {
         isOpen={isExportModalOpen}
         onClose={closeExportModal} // Close handler
         data={filteredData}
-        filename={`campaign_data_${new Date().toISOString()}.csv`}
+        filename={`DMP_data_${new Date().toISOString()}.csv`}
         filters={filters}
       />
       {/*  */}
@@ -517,6 +519,7 @@ const Explaineddmp = () => {
                   <th>Record URL</th>
                   <th>Call Type</th>
                   <th>Source</th>
+                  <th>Created On</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -544,14 +547,39 @@ const Explaineddmp = () => {
                       <td>{row.second_disposition || "N/A"}</td>
                       <td>
                         {row.call_start_time
-                          ? new Date(row.call_start_time).toLocaleString()
+                          ? new Date(row.call_start_time).toLocaleString(
+                              "en-GB",
+                              {
+                                timeZone: "UTC", // Force UTC time
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: true, // Display in 12-hour format
+                              }
+                            )
                           : "N/A"}
                       </td>
                       <td>
                         {row.call_end_time
-                          ? new Date(row.call_end_time).toLocaleString()
+                          ? new Date(row.call_end_time).toLocaleString(
+                              "en-GB",
+                              {
+                                timeZone: "UTC", // Force UTC time
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: true, // Display in 12-hour format
+                              }
+                            )
                           : "N/A"}
                       </td>
+
                       <td>
                         {row.record_url ? (
                           <a
@@ -568,6 +596,7 @@ const Explaineddmp = () => {
                       </td>
                       <td>{row.call_type || "N/A"}</td>
                       <td>{row.source || "N/A"}</td>
+                      <td>{row.Created_On || "N/A"}</td>
                     </tr>
                   ))
                 ) : (

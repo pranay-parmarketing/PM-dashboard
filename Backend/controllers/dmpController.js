@@ -259,6 +259,8 @@ const createDmpData = async (req, res) => {
     }
 
     // Step 4: Extract phone numbers for lookup
+    console.log("DMP Data: ", dmps);
+
     const phoneNumbers = dmps.map((dmp) => String(dmp.phone).trim());
 
     // Step 5: Check if any DMP already exists in the database
@@ -287,6 +289,7 @@ const createDmpData = async (req, res) => {
             record_url: dmp.record_url,
             call_type: dmp.call_type,
             source: dmp.source,
+            Created_On: dmp.Created_On,
           },
         },
         upsert: true, // Insert if not found, otherwise update

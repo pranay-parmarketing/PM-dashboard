@@ -39,6 +39,10 @@ const dmpSchema = new mongoose.Schema({
   record_url: { type: String },
   call_type: { type: String },
   source: { type: String },
+  Created_On: {
+    type: String,
+    default: 'NA', 
+  },
 });
 
 module.exports = mongoose.model("Dmp", dmpSchema);
