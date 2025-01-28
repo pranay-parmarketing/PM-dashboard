@@ -41,6 +41,7 @@ const Leads = () => {
   const [totalPages, setTotalPages] = useState(0);
   //
   const [selectedUser, setSelectedUser] = useState(null);
+  const [totalLeads, setTotalLeads] = useState(0);
 
   //
 
@@ -240,6 +241,7 @@ const Leads = () => {
           setCampaignDetails(response.data.leads);
           setCurrentPage(response.data.currentPage - 1);
           setTotalPages(response.data.totalPages);
+          setTotalLeads(response.data.totalLeads);
         } else {
           console.error("No leads found in the response");
         }
@@ -454,7 +456,7 @@ const Leads = () => {
       <div className="homeContainer">
         <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
           <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
-            Leads
+            Leads 
           </h1>
           <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
             <button
@@ -552,7 +554,9 @@ const Leads = () => {
               </tbody>
             </table>
           </div>
-
+          <div className="py-2">
+          <p className="text-lg text-center bg-gray-800 text-white">Total leads {totalLeads}</p>
+          </div>
           <Pagination
             handlePreviousPage={handlePreviousPage}
             isPrevButtonDisabled={isPrevButtonDisabled}

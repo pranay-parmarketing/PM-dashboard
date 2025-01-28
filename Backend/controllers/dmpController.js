@@ -119,6 +119,107 @@ function parseExcelDate(excelDate) {
 //   }
 // };
 
+// const createDmpData = async (req, res) => {
+//   try {
+//     let dmps = [];
+
+//     // Step 1: Check if there is data in the request body
+//     if (req.body && Object.keys(req.body).length > 0) {
+//       dmps = Array.isArray(req.body) ? req.body : [req.body];
+//     }
+//     console.log("DMPs from request body: ", dmps);
+
+//     // Step 2: Process uploaded file if present
+//     if (req.file) {
+//       const fileBuffer = req.file.buffer;
+
+//       // Read and parse the uploaded file
+//       const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+//       const sheetName = workbook.SheetNames[0]; // Get the first sheet
+//       let sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+//       // Parse dates for fields in the schema
+//       sheetData = sheetData.map((row) => {
+//         ["call_start_time", "call_end_time"].forEach((key) => {
+//           if (row[key] && !isNaN(new Date(row[key]))) {
+//             row[key] = new Date(row[key]);
+//           }
+//         });
+//         return row;
+//       });
+
+//       // Combine the file data with the body data
+//       dmps = dmps.concat(sheetData);
+//     }
+
+//     // Step 3: If no data found, return error
+//     if (dmps.length === 0) {
+//       return res.status(400).json({ error: "No data provided in request body or file" });
+//     }
+
+//     // Step 4: Extract phone numbers for lookup
+//     const phoneNumbers = dmps.map((dmp) => String(dmp.phone).trim());
+
+//     // Step 5: Check if any DMP already exists in the database
+//     const existingDmps = await Dmp.find({ phone: { $in: phoneNumbers } });
+
+//     // Step 6: Filter out existing DMPs and keep only the new ones
+//     const newDmps = dmps.filter(
+//       (dmp) => !existingDmps.some((existingDmp) => existingDmp.phone === String(dmp.phone).trim())
+//     );
+
+//     // Step 7: If no new DMPs, return a message indicating all data already exists
+//     if (newDmps.length === 0) {
+//       return res.status(400).json({
+//         message: "No new DMP data to insert, all entries already exist.",
+//       });
+//     }
+
+//     // Step 8: Prepare bulk operations for insert/update
+//     const bulkOps = newDmps.map((dmp) => ({
+//       updateOne: {
+//         filter: { phone: String(dmp.phone).trim() },
+//         update: {
+//           $setOnInsert: {
+//             cust_name: dmp.cust_name,
+//             phone: String(dmp.phone).trim(),
+//             email: dmp.email,
+//             agent_id: dmp.agent_id,
+//             agent_username: dmp.agent_username,
+//             agent_name: dmp.agent_name,
+//             campaign_id: dmp.campaign_id,
+//             campaign_name: dmp.campaign_name,
+//             process_name: dmp.process_name,
+//             process_id: dmp.process_id,
+//             first_disposition: dmp.first_disposition,
+//             second_disposition: dmp.second_disposition,
+//             call_start_time: dmp.call_start_time ? new Date(dmp.call_start_time) : null,
+//             call_end_time: dmp.call_end_time ? new Date(dmp.call_end_time) : null,
+//             record_url: dmp.record_url,
+//             call_type: dmp.call_type,
+//             source: dmp.source,
+//           },
+//         },
+//         upsert: true, // Insert if not found
+//       },
+//     }));
+
+//     // Step 9: Perform bulk insert/update operation
+//     if (bulkOps.length > 0) {
+//       const result = await Dmp.bulkWrite(bulkOps);
+//       console.log(`${result.upsertedCount} DMP entries inserted`);
+//     }
+
+//     // Step 10: Return success message
+//     res.status(200).json({ message: "DMP data processed successfully!" });
+//   } catch (err) {
+//     // Log the error and return failure response
+//     console.error("Error saving DMP data:", err);
+//     res.status(500).json({ error: "Failed to save DMP data" });
+//   }
+// };
+
+
 const createDmpData = async (req, res) => {
   try {
     let dmps = [];
@@ -163,24 +264,12 @@ const createDmpData = async (req, res) => {
     // Step 5: Check if any DMP already exists in the database
     const existingDmps = await Dmp.find({ phone: { $in: phoneNumbers } });
 
-    // Step 6: Filter out existing DMPs and keep only the new ones
-    const newDmps = dmps.filter(
-      (dmp) => !existingDmps.some((existingDmp) => existingDmp.phone === String(dmp.phone).trim())
-    );
-
-    // Step 7: If no new DMPs, return a message indicating all data already exists
-    if (newDmps.length === 0) {
-      return res.status(400).json({
-        message: "No new DMP data to insert, all entries already exist.",
-      });
-    }
-
-    // Step 8: Prepare bulk operations for insert/update
-    const bulkOps = newDmps.map((dmp) => ({
+    // Step 6: Prepare bulk operations for insert/update
+    const bulkOps = dmps.map((dmp) => ({
       updateOne: {
         filter: { phone: String(dmp.phone).trim() },
         update: {
-          $setOnInsert: {
+          $set: {
             cust_name: dmp.cust_name,
             phone: String(dmp.phone).trim(),
             email: dmp.email,
@@ -200,17 +289,18 @@ const createDmpData = async (req, res) => {
             source: dmp.source,
           },
         },
-        upsert: true, // Insert if not found
+        upsert: true, // Insert if not found, otherwise update
       },
     }));
 
-    // Step 9: Perform bulk insert/update operation
+    // Step 7: Perform bulk insert/update operation
     if (bulkOps.length > 0) {
       const result = await Dmp.bulkWrite(bulkOps);
-      console.log(`${result.upsertedCount} DMP entries inserted`);
+      console.log(`${result.upsertedCount} new DMP entries inserted`);
+      console.log(`${result.modifiedCount} existing DMP entries updated`);
     }
 
-    // Step 10: Return success message
+    // Step 8: Return success message
     res.status(200).json({ message: "DMP data processed successfully!" });
   } catch (err) {
     // Log the error and return failure response
