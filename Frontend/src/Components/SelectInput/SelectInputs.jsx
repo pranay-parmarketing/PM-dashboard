@@ -119,7 +119,6 @@ const SelectInputs = ({
       {name === "campaign" ||
       name === "adset" ||
       name === "ads" ||
-      name === "dmp" ||
       name === "lead" ? (
         <Brands setSearch={setSearch} setCurrentPage={setCurrentPage} />
       ) : null}

@@ -8,6 +8,8 @@ const Pagination = ({
   rowsPerPage,
   handleNextPage,
   isNextButtonDisabled,
+  apitotalpage,
+  name
 }) => {
   return (
     <div className="pagination-controls flex justify-between items-center mt-4">
@@ -24,10 +26,11 @@ const Pagination = ({
       </button>
       <span>
         Page {currentPage + 1} of{" "}
-        {Math.ceil(campaignDetails.length / rowsPerPage)}
+        {name === "leadsent" || name === "dmp" || name === "leads"
+          ? apitotalpage
+          : Math.ceil(campaignDetails.length / rowsPerPage)}
       </span>
-  
-      
+
       <button
         onClick={handleNextPage}
         disabled={isNextButtonDisabled}

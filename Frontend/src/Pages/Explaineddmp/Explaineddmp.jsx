@@ -41,6 +41,8 @@ const Explaineddmp = () => {
 
   //
 
+  const [apitotalpage, setApitotalpage] = useState(0);
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
@@ -136,6 +138,12 @@ const Explaineddmp = () => {
       loadCampaignData();
     }
   }, [selectedAccount]);
+
+   useEffect(() => {
+      if (mongoData?.totalPages) {
+        setApitotalpage(mongoData.totalPages);
+      }
+    }, [mongoData]);
 
   const handleEdit = (row) => {
     setSelectedRow(row);
@@ -282,80 +290,81 @@ const Explaineddmp = () => {
     switch (preset) {
       case "last-7-days": {
         const last7Days = new Date();
-        last7Days.setDate(currentDate.getDate() - 7);
-        last7Days.setHours(0, 0, 0, 0);
-
+        last7Days.setDate(last7Days.getDate() - 7);
+        last7Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
+      
         filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
+          const callStartDate = detail.call_start_time
+            ? new Date(detail.call_start_time)
             : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= last7Days;
+          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
+          return callStartDate && callStartDate >= last7Days; // Filter based on call_start_time
         });
         break;
       }
-
+      
       case "last-14-days": {
         const last14Days = new Date();
-        last14Days.setDate(currentDate.getDate() - 14);
-        last14Days.setHours(0, 0, 0, 0);
-
+        last14Days.setDate(last14Days.getDate() - 14);
+        last14Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
+      
         filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
+          const callStartDate = detail.call_start_time
+            ? new Date(detail.call_start_time)
             : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= last14Days;
+          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
+          return callStartDate && callStartDate >= last14Days; // Filter based on call_start_time
         });
         break;
       }
-
-      //
-
+      
       case "last-30-days": {
         const last30Days = new Date();
-        last30Days.setDate(currentDate.getDate() - 30);
-        last30Days.setHours(0, 0, 0, 0);
-
+        last30Days.setDate(last30Days.getDate() - 30);
+        last30Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
+      
         filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
+          const callStartDate = detail.call_start_time
+            ? new Date(detail.call_start_time)
             : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= last30Days;
+          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
+          return callStartDate && callStartDate >= last30Days; // Filter based on call_start_time
         });
         break;
       }
+      
 
       case "yesterday": {
         const yesterday = new Date();
-        yesterday.setDate(currentDate.getDate() - 1);
+        yesterday.setDate(yesterday.getDate() - 1);
         yesterday.setHours(0, 0, 0, 0);
-
+      
         filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
+          const callStartDate = detail.call_start_time
+            ? new Date(detail.call_start_time)
             : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= yesterday;
+          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Set the time part to 00:00:00 for comparison
+          return callStartDate && callStartDate >= yesterday;
         });
         break;
       }
+      
 
       case "last-day": {
         const lastDay = new Date();
-        lastDay.setDate(currentDate.getDate() - 1);
-        lastDay.setHours(0, 0, 0, 0);
-
+        lastDay.setDate(lastDay.getDate() - 1);
+        lastDay.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
+      
         filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
+          const callStartDate = detail.call_start_time
+            ? new Date(detail.call_start_time)
             : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= lastDay;
+          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
+          return callStartDate && callStartDate >= lastDay; // Filter based on call_start_time
         });
         break;
       }
+      
 
       //
 
@@ -363,23 +372,23 @@ const Explaineddmp = () => {
         if (startDate && endDate) {
           const customStartDate = new Date(startDate);
           const customEndDate = new Date(endDate);
-          customStartDate.setHours(0, 0, 0, 0);
-          customEndDate.setHours(23, 59, 59, 999);
-
+          customStartDate.setHours(0, 0, 0, 0); // Set start date to midnight
+          customEndDate.setHours(23, 59, 59, 999); // Set end date to just before midnight of the next day
+      
           filteredData = details.filter((detail) => {
-            const createdDate = detail.createdOn
-              ? new Date(detail.createdOn)
+            const callStartDate = detail.call_start_time
+              ? new Date(detail.call_start_time)
               : null;
             return (
-              createdDate &&
-              createdDate >= customStartDate &&
-              createdDate <= customEndDate
+              callStartDate &&
+              callStartDate >= customStartDate &&
+              callStartDate <= customEndDate
             );
           });
         }
         break;
       }
-
+      
       default:
         filteredData = details;
         break;
@@ -416,6 +425,9 @@ const Explaineddmp = () => {
     filters.datePreset
   );
 
+
+  
+
   return (
     <div className="home">
       <ChooseFileModal
@@ -440,6 +452,7 @@ const Explaineddmp = () => {
       />
       {/*  */}
       <Export
+        name = 'dmp'
         isOpen={isExportModalOpen}
         onClose={closeExportModal} // Close handler
         data={filteredData}
@@ -510,8 +523,7 @@ const Explaineddmp = () => {
                   <th>Agent Name</th>
                   <th>Campaign ID</th>
                   <th>Campaign Name</th>
-                  <th>Process Name</th>
-                  <th>Process ID</th>
+                 
                   <th>First Disposition</th>
                   <th>Second Disposition</th>
                   <th>Call Start Time</th>
@@ -541,8 +553,7 @@ const Explaineddmp = () => {
                       <td>{row.agent_name || "N/A"}</td>
                       <td>{row.campaign_id || "N/A"}</td>
                       <td>{row.campaign_name || "N/A"}</td>
-                      <td>{row.process_name || "N/A"}</td>
-                      <td>{row.process_id || "N/A"}</td>
+                    
                       <td>{row.first_disposition || "N/A"}</td>
                       <td>{row.second_disposition || "N/A"}</td>
                       <td>
@@ -611,6 +622,8 @@ const Explaineddmp = () => {
           </div>
 
           <Pagination
+           name={"dmp"}
+           apitotalpage={apitotalpage}
             handlePreviousPage={handlePreviousPage}
             isPrevButtonDisabled={isPrevButtonDisabled}
             currentPage={currentPage}

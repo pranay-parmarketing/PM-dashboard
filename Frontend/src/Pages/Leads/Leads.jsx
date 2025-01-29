@@ -44,6 +44,7 @@ const Leads = () => {
   const [totalLeads, setTotalLeads] = useState(0);
 
   //
+  const [apitotalpage, setApitotalpage] = useState(0);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -140,6 +141,13 @@ const Leads = () => {
       loadCampaignData();
     }
   }, [selectedAccount]);
+
+   useEffect(() => {
+      if (mongoData?.totalPages) {
+        setApitotalpage(mongoData.totalPages);
+      }
+    }, [mongoData]);
+  
 
   const handleEdit = (row) => {
     setSelectedRow(row);
@@ -445,6 +453,7 @@ const Leads = () => {
 
       {/*  */}
       <Export
+        name="lead"
         isOpen={isExportModalOpen}
         onClose={closeExportModal} // Close handler
         data={filteredData}
@@ -456,7 +465,7 @@ const Leads = () => {
       <div className="homeContainer">
         <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
           <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
-            Leads 
+            Leads
           </h1>
           <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
             <button
@@ -555,9 +564,13 @@ const Leads = () => {
             </table>
           </div>
           <div className="py-2">
-          <p className="text-lg text-center bg-gray-800 text-white">Total leads {totalLeads}</p>
+            <p className="text-lg text-center bg-gray-800 text-white">
+              Total leads {totalLeads}
+            </p>
           </div>
           <Pagination
+            name={"leads"}
+            apitotalpage={apitotalpage}
             handlePreviousPage={handlePreviousPage}
             isPrevButtonDisabled={isPrevButtonDisabled}
             currentPage={currentPage}
