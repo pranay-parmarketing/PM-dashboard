@@ -379,13 +379,205 @@ const createDmpData = async (req, res) => {
 // };
 
 
+// const getDmpData = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const pageSize = parseInt(req.query.pageSize) || 10;
+//     const search = req.query.search || "";
+//     const startDate = req.query.startDate || null;
+//     const endDate = req.query.endDate || null;
+//     const sortBy = req.query.sortBy || "date";
+//     const sortDirection = req.query.sortDirection || "desc";
+//     const sortOrder = sortDirection === "asc" ? 1 : -1;
+
+//     if (page <= 0 || pageSize <= 0) {
+//       return res.status(400).json({ error: "Invalid pagination parameters" });
+//     }
+
+//     const skip = (page - 1) * pageSize;
+
+//     // Build search filter
+//     const searchFilter = search
+//       ? {
+//           $or: [
+//             { phone: { $regex: search, $options: "i" } },
+//             { source: { $regex: search, $options: "i" } },
+//             { agent_username: { $regex: search, $options: "i" } },
+//             { cust_name: { $regex: search, $options: "i" } },
+//             { first_disposition: { $regex: search, $options: "i" } },
+//           ],
+//         }
+//       : {};
+
+//     if (startDate && endDate) {
+//       searchFilter.date = {
+//         $gte: startDate,
+//         $lte: endDate,
+//       };
+//     }
+
+//     // Debug: log the search filter
+//     console.log("Search Filter:", JSON.stringify(searchFilter, null, 2));
+
+//     // Query the database
+//     const dmps = await Dmp.find(searchFilter)
+//       .sort({ [sortBy]: sortOrder, _id: -1 })
+//       .skip(skip)
+//       .limit(pageSize);
+
+//     // Log the result count
+//     const totalDmps = await Dmp.countDocuments(searchFilter);
+//     console.log("Total DMPs matching filter:", totalDmps);
+
+//     const totalPages = Math.ceil(totalDmps / pageSize);
+
+//     res.status(200).json({
+//       dmps,
+//       currentPage: page,
+//       totalPages,
+//       totalDmps,
+//     });
+//   } catch (error) {
+//     console.error("Error occurred while fetching DMP data:", error);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+
+// const getDmpData = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const pageSize = parseInt(req.query.pageSize) || 10;
+//     const search = req.query.search || "";
+//     let startDate = req.query.startDate || null;
+//     let endDate = req.query.endDate || null;
+//     const filterPreset = req.query.filterPreset || ""; // Added for dynamic filters like "last-7-days"
+//     const sortBy = req.query.sortBy || "date";
+//     const sortDirection = req.query.sortDirection || "desc";
+//     const sortOrder = sortDirection === "asc" ? 1 : -1;
+
+//     if (page <= 0 || pageSize <= 0) {
+//       return res.status(400).json({ error: "Invalid pagination parameters" });
+//     }
+
+//     const skip = (page - 1) * pageSize;
+
+//     // Handle date filtering based on preset
+//     if (filterPreset) {
+//       const currentDate = new Date();
+//       switch (filterPreset) {
+//         case "last-7-days":
+//           startDate = new Date(currentDate);
+//           startDate.setDate(currentDate.getDate() - 7);
+//           startDate.setUTCHours(0, 0, 0, 0); // Start of the day 7 days ago
+//           endDate = new Date(currentDate);
+//           endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+//           break;
+        
+//         case "last-14-days":
+//           startDate = new Date(currentDate);
+//           startDate.setDate(currentDate.getDate() - 14);
+//           startDate.setUTCHours(0, 0, 0, 0); // Start of the day 14 days ago
+//           endDate = new Date(currentDate);
+//           endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+//           break;
+        
+//         case "last-30-days":
+//           startDate = new Date(currentDate);
+//           startDate.setDate(currentDate.getDate() - 30);
+//           startDate.setUTCHours(0, 0, 0, 0); // Start of the day 30 days ago
+//           endDate = new Date(currentDate);
+//           endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+//           break;
+
+//           case "yesterday":
+//             const currentDate = new Date();
+//             startDate = new Date(currentDate);
+//             startDate.setDate(currentDate.getDate() - 1);
+//             startDate.setUTCHours(0, 0, 0, 0); // Start of yesterday in UTC
+          
+//             endDate = new Date(startDate);
+//             endDate.setUTCHours(23, 59, 59, 999); // End of yesterday in UTC
+//             break;
+          
+//         case "custom-range":
+//           if (startDate && endDate) {
+//             startDate = new Date(startDate);
+//             endDate = new Date(endDate);
+//             endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+//           }
+//           break;
+//         default:
+//           break;
+//       }
+//     }
+//     console.log("Start Date:", startDate);
+//     console.log("End Date:", endDate);
+    
+//     // Convert startDate and endDate to Date objects if they are provided
+//     if (startDate) startDate = new Date(startDate); // Ensure it's a Date object
+//     if (endDate) {
+//       endDate = new Date(endDate); // Ensure it's a Date object
+//       // Set endDate to the end of the day (23:59:59.999)
+//       endDate.setUTCHours(23, 59, 59, 999);
+//     }
+
+//     // Build search filter
+//     const searchFilter = search
+//       ? {
+//           $or: [
+//             { phone: { $regex: search, $options: "i" } },
+//             { source: { $regex: search, $options: "i" } },
+//             { agent_username: { $regex: search, $options: "i" } },
+//             { cust_name: { $regex: search, $options: "i" } },
+//             { first_disposition: { $regex: search, $options: "i" } },
+//           ],
+//         }
+//       : {};
+
+//     // Add date and time filter if both startDate and endDate are provided
+//     if (startDate && endDate) {
+//       searchFilter.call_start_time = {
+//         $gte: startDate, // Greater than or equal to the start date and time
+//         $lte: endDate,   // Less than or equal to the end date and time
+//       };
+//     }
+
+//     // Debug: log the search filter
+//     console.log("Search Filter:", JSON.stringify(searchFilter, null, 2));
+
+//     // Query the database
+//     const dmps = await Dmp.find(searchFilter)
+//       .sort({ [sortBy]: sortOrder, _id: -1 })
+//       .skip(skip)
+//       .limit(pageSize);
+
+//     // Log the result count
+//     const totalDmps = await Dmp.countDocuments(searchFilter);
+//     console.log("Total DMPs matching filter:", totalDmps);
+
+//     const totalPages = Math.ceil(totalDmps / pageSize);
+
+//     res.status(200).json({
+//       dmps,
+//       currentPage: page,
+//       totalPages,
+//       totalDmps,
+//     });
+//   } catch (error) {
+//     console.error("Error occurred while fetching DMP data:", error);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
 const getDmpData = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const search = req.query.search || "";
-    const startDate = req.query.startDate || null;
-    const endDate = req.query.endDate || null;
+    let startDate = req.query.startDate || null;
+    let endDate = req.query.endDate || null;
+    const filterPreset = req.query.filterPreset || ""; // Added for dynamic filters like "last-7-days"
     const sortBy = req.query.sortBy || "date";
     const sortDirection = req.query.sortDirection || "desc";
     const sortOrder = sortDirection === "asc" ? 1 : -1;
@@ -396,23 +588,92 @@ const getDmpData = async (req, res) => {
 
     const skip = (page - 1) * pageSize;
 
+    // Handle date filtering based on preset
+    if (filterPreset) {
+      const currentDate = new Date(); // Declare currentDate here
+      switch (filterPreset) {
+        case "last-7-days":
+          startDate = new Date(currentDate);
+          startDate.setDate(currentDate.getDate() - 7);
+          startDate.setUTCHours(0, 0, 0, 0); // Start of the day 7 days ago
+          endDate = new Date(currentDate);
+          endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+          break;
+
+        case "last-14-days":
+          startDate = new Date(currentDate);
+          startDate.setDate(currentDate.getDate() - 14);
+          startDate.setUTCHours(0, 0, 0, 0); // Start of the day 14 days ago
+          endDate = new Date(currentDate);
+          endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+          break;
+
+        case "last-30-days":
+          startDate = new Date(currentDate);
+          startDate.setDate(currentDate.getDate() - 30);
+          startDate.setUTCHours(0, 0, 0, 0); // Start of the day 30 days ago
+          endDate = new Date(currentDate);
+          endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+          break;
+
+        case "yesterday":
+          // Use the outer currentDate, do not redeclare it
+          startDate = new Date(currentDate);
+          startDate.setDate(currentDate.getDate() - 1);
+          startDate.setUTCHours(0, 0, 0, 0); // Start of yesterday in UTC
+          endDate = new Date(startDate);
+          endDate.setUTCHours(23, 59, 59, 999); // End of yesterday in UTC
+          break;
+
+        case "custom-range":
+          if (startDate && endDate) {
+            startDate = new Date(startDate); // Ensure it's a Date object
+            endDate = new Date(endDate); // Ensure it's a Date object
+            endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+          } else {
+            return res.status(400).json({ error: "Both startDate and endDate are required for custom-range" });
+          }
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    // Debug: log the date ranges
+    console.log("Filter Preset:", filterPreset);
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+
+    // Convert startDate and endDate to Date objects if they are provided
+    if (startDate && isNaN(new Date(startDate).getTime())) {
+      return res.status(400).json({ error: "Invalid startDate" });
+    }
+    if (endDate && isNaN(new Date(endDate).getTime())) {
+      return res.status(400).json({ error: "Invalid endDate" });
+    }
+
+    if (startDate) startDate = new Date(startDate);
+    if (endDate) {
+      endDate = new Date(endDate);
+      endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+    }
+
     // Build search filter
+    const searchFields = ["phone", "source", "agent_username", "cust_name", "first_disposition"];
     const searchFilter = search
       ? {
-          $or: [
-            { phone: { $regex: search, $options: "i" } },
-            { source: { $regex: search, $options: "i" } },
-            { agent_username: { $regex: search, $options: "i" } },
-            { cust_name: { $regex: search, $options: "i" } },
-            { first_disposition: { $regex: search, $options: "i" } },
-          ],
+          $or: searchFields.map((field) => ({
+            [field]: { $regex: search, $options: "i" },
+          })),
         }
       : {};
 
+    // Add date and time filter if both startDate and endDate are provided
     if (startDate && endDate) {
-      searchFilter.date = {
-        $gte: startDate,
-        $lte: endDate,
+      searchFilter.call_start_time = {
+        $gte: startDate, // Greater than or equal to the start date and time
+        $lte: endDate,   // Less than or equal to the end date and time
       };
     }
 
@@ -439,7 +700,7 @@ const getDmpData = async (req, res) => {
     });
   } catch (error) {
     console.error("Error occurred while fetching DMP data:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error", details: error.message });
   }
 };
 

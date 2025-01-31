@@ -2,7 +2,7 @@
 
 // function FilterModal({ isOpen, onClose, Base, onApplyFilters,startDate,setStartDate,endDate,setEndDate }) {
 //   const [datePreset, setDatePreset] = useState("");
- 
+
 //   const [format, setFormat] = useState("");
 
 //   // Handle changes to the date preset
@@ -19,7 +19,7 @@
 //   const handleStartDateChange = (e) => {
 //     setStartDate(e.target.value); // Ensure this sets the correct value
 //   };
-  
+
 //   const handleEndDateChange = (e) => {
 //     setEndDate(e.target.value); // Ensure this sets the correct value
 //   };
@@ -145,13 +145,20 @@
 
 // export default FilterModal;
 
-
-
 import React, { useState } from "react";
 
-function FilterModal({ isOpen, onClose, Base, onApplyFilters,startDate,setStartDate,endDate,setEndDate }) {
+function FilterModal({
+  isOpen,
+  onClose,
+  Base,
+  onApplyFilters,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+}) {
   const [datePreset, setDatePreset] = useState("");
- 
+
   const [format, setFormat] = useState("");
 
   // Handle changes to the date preset
@@ -168,7 +175,7 @@ function FilterModal({ isOpen, onClose, Base, onApplyFilters,startDate,setStartD
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value); // Ensure this sets the correct value
   };
-  
+
   const handleEndDateChange = (e) => {
     setEndDate(e.target.value); // Ensure this sets the correct value
   };
@@ -190,7 +197,7 @@ function FilterModal({ isOpen, onClose, Base, onApplyFilters,startDate,setStartD
 
   // If the modal isn't open, return null
   if (!isOpen) return null;
-
+console.log('datePreset',datePreset)
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -214,7 +221,8 @@ function FilterModal({ isOpen, onClose, Base, onApplyFilters,startDate,setStartD
               <option value="last-30-days">Last 30 Days</option>
               <option value="yesterday">Yesterday</option>
               <option value="last-day">Last Day</option>
-              <option value="custom-range">Custom Range</option> {/* Added option for custom date range */}
+              <option value="custom-range">Custom Range</option>{" "}
+              {/* Added option for custom date range */}
             </select>
           </label>
 
@@ -241,10 +249,6 @@ function FilterModal({ isOpen, onClose, Base, onApplyFilters,startDate,setStartD
               </label>
             </div>
           )}
-
-         
-
-        
         </div>
         <div className="modal-footer">
           <button className="modal-footer-btn" onClick={onClose}>
