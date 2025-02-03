@@ -2,223 +2,14 @@ const multer = require("multer");
 const XLSX = require("xlsx");
 const Dmp = require("../models/Dmp");
 
-const upload = multer({ storage: multer.memoryStorage() }).single("excelFile"); 
+const upload = multer({ storage: multer.memoryStorage() }).single("excelFile");
 
 function parseExcelDate(excelDate) {
   const excelEpoch = new Date(1899, 11, 30);
-  const days = Math.floor(excelDate); 
-  const msPerDay = 24 * 60 * 60 * 1000; 
-  return new Date(excelEpoch.getTime() + days * msPerDay); 
+  const days = Math.floor(excelDate);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return new Date(excelEpoch.getTime() + days * msPerDay);
 }
-
-// const createDmpData = async (req, res) => {
-//   try {
-//     let dmps = [];
-
-//     if (req.body && Object.keys(req.body).length > 0) {
-//       dmps = Array.isArray(req.body) ? req.body : [req.body];
-//     }
-//     console.log("DMPs from request body: ", dmps);
-
-//     if (req.file) {
-//       const fileBuffer = req.file.buffer;
-
-//       const workbook = XLSX.read(fileBuffer, { type: "buffer" });
-//       const sheetName = workbook.SheetNames[0]; 
-//       let sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-
-//       sheetData = sheetData.map((row) => {
-//         if (row.date && !isNaN(row.date)) {
-//           row.date = parseExcelDate(row.date).toISOString().split("T")[0]; 
-//         }
-//         if (row.lead_date && !isNaN(row.lead_date)) {
-//           row.lead_date = parseExcelDate(row.lead_date)
-//             .toISOString()
-//             .split("T")[0];
-//         }
-//         return row;
-//       });
-
-     
-//       dmps = dmps.concat(sheetData);
-//     }
-
-//     if (dmps.length === 0) {
-//       return res
-//         .status(400)
-//         .json({ error: "No data provided in request body or file" });
-//     }
-
-   
-//     const filteredDmps = dmps.filter((dmp) => {
-//       const phone = dmp.phone ? String(dmp.phone).trim() : null;
-//       const leadDate = dmp.lead_date ? new Date(dmp.lead_date) : null;
-//       const date = dmp.date ? new Date(dmp.date) : null;
-//       const source = dmp.source ? dmp.source.trim() : null;
-//       const agent = dmp.agent ? dmp.agent.trim() : null;
-
-//       return (
-//         phone &&
-//         leadDate &&
-//         date &&
-//         source &&
-//         agent &&
-//         !isNaN(leadDate.getTime()) &&
-//         !isNaN(date.getTime())
-//       );
-//     });
-
-//     if (filteredDmps.length === 0) {
-//       return res
-//         .status(400)
-//         .json({ error: "No valid DMP data provided in request body or file" });
-//     }
-
-//     const phoneNumbers = filteredDmps.map((dmp) => String(dmp.phone).trim());
-
-//     const existingDmps = await Dmp.find({ phone: { $in: phoneNumbers } });
-
-//     const newDmps = filteredDmps.filter(
-//       (dmp) =>
-//         !existingDmps.some(
-//           (existingDmp) => existingDmp.phone === String(dmp.phone).trim()
-//         )
-//     );
-
-//     if (newDmps.length === 0) {
-//       return res.status(400).json({
-//         message: "No new DMP data to insert, all entries already exist.",
-//       });
-//     }
-
-//     const bulkOps = newDmps.map((dmp) => ({
-//       updateOne: {
-//         filter: { phone: String(dmp.phone).trim() },
-//         update: {
-//           $setOnInsert: {
-//             lead_date: dmp.lead_date,
-//             date: dmp.date,
-//             phone: String(dmp.phone).trim(),
-//             source: dmp.source,
-//             agent: dmp.agent,
-//           },
-//         },
-//         upsert: true, 
-//       },
-//     }));
-
-//     if (bulkOps.length > 0) {
-//       const result = await Dmp.bulkWrite(bulkOps);
-//       console.log(`${result.upsertedCount} DMP entries inserted`);
-//     }
-
-//     res.status(200).json({ message: "DMP data processed successfully!" });
-//   } catch (err) {
-//     console.error("Error saving DMP data:", err);
-//     res.status(500).json({ error: "Failed to save DMP data" });
-//   }
-// };
-
-// const createDmpData = async (req, res) => {
-//   try {
-//     let dmps = [];
-
-//     // Step 1: Check if there is data in the request body
-//     if (req.body && Object.keys(req.body).length > 0) {
-//       dmps = Array.isArray(req.body) ? req.body : [req.body];
-//     }
-//     console.log("DMPs from request body: ", dmps);
-
-//     // Step 2: Process uploaded file if present
-//     if (req.file) {
-//       const fileBuffer = req.file.buffer;
-
-//       // Read and parse the uploaded file
-//       const workbook = XLSX.read(fileBuffer, { type: "buffer" });
-//       const sheetName = workbook.SheetNames[0]; // Get the first sheet
-//       let sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-
-//       // Parse dates for fields in the schema
-//       sheetData = sheetData.map((row) => {
-//         ["call_start_time", "call_end_time"].forEach((key) => {
-//           if (row[key] && !isNaN(new Date(row[key]))) {
-//             row[key] = new Date(row[key]);
-//           }
-//         });
-//         return row;
-//       });
-
-//       // Combine the file data with the body data
-//       dmps = dmps.concat(sheetData);
-//     }
-
-//     // Step 3: If no data found, return error
-//     if (dmps.length === 0) {
-//       return res.status(400).json({ error: "No data provided in request body or file" });
-//     }
-
-//     // Step 4: Extract phone numbers for lookup
-//     const phoneNumbers = dmps.map((dmp) => String(dmp.phone).trim());
-
-//     // Step 5: Check if any DMP already exists in the database
-//     const existingDmps = await Dmp.find({ phone: { $in: phoneNumbers } });
-
-//     // Step 6: Filter out existing DMPs and keep only the new ones
-//     const newDmps = dmps.filter(
-//       (dmp) => !existingDmps.some((existingDmp) => existingDmp.phone === String(dmp.phone).trim())
-//     );
-
-//     // Step 7: If no new DMPs, return a message indicating all data already exists
-//     if (newDmps.length === 0) {
-//       return res.status(400).json({
-//         message: "No new DMP data to insert, all entries already exist.",
-//       });
-//     }
-
-//     // Step 8: Prepare bulk operations for insert/update
-//     const bulkOps = newDmps.map((dmp) => ({
-//       updateOne: {
-//         filter: { phone: String(dmp.phone).trim() },
-//         update: {
-//           $setOnInsert: {
-//             cust_name: dmp.cust_name,
-//             phone: String(dmp.phone).trim(),
-//             email: dmp.email,
-//             agent_id: dmp.agent_id,
-//             agent_username: dmp.agent_username,
-//             agent_name: dmp.agent_name,
-//             campaign_id: dmp.campaign_id,
-//             campaign_name: dmp.campaign_name,
-//             process_name: dmp.process_name,
-//             process_id: dmp.process_id,
-//             first_disposition: dmp.first_disposition,
-//             second_disposition: dmp.second_disposition,
-//             call_start_time: dmp.call_start_time ? new Date(dmp.call_start_time) : null,
-//             call_end_time: dmp.call_end_time ? new Date(dmp.call_end_time) : null,
-//             record_url: dmp.record_url,
-//             call_type: dmp.call_type,
-//             source: dmp.source,
-//           },
-//         },
-//         upsert: true, // Insert if not found
-//       },
-//     }));
-
-//     // Step 9: Perform bulk insert/update operation
-//     if (bulkOps.length > 0) {
-//       const result = await Dmp.bulkWrite(bulkOps);
-//       console.log(`${result.upsertedCount} DMP entries inserted`);
-//     }
-
-//     // Step 10: Return success message
-//     res.status(200).json({ message: "DMP data processed successfully!" });
-//   } catch (err) {
-//     // Log the error and return failure response
-//     console.error("Error saving DMP data:", err);
-//     res.status(500).json({ error: "Failed to save DMP data" });
-//   }
-// };
-
 
 const createDmpData = async (req, res) => {
   try {
@@ -255,7 +46,9 @@ const createDmpData = async (req, res) => {
 
     // Step 3: If no data found, return error
     if (dmps.length === 0) {
-      return res.status(400).json({ error: "No data provided in request body or file" });
+      return res
+        .status(400)
+        .json({ error: "No data provided in request body or file" });
     }
 
     // Step 4: Extract phone numbers for lookup
@@ -284,8 +77,12 @@ const createDmpData = async (req, res) => {
             process_id: dmp.process_id,
             first_disposition: dmp.first_disposition,
             second_disposition: dmp.second_disposition,
-            call_start_time: dmp.call_start_time ? new Date(dmp.call_start_time) : null,
-            call_end_time: dmp.call_end_time ? new Date(dmp.call_end_time) : null,
+            call_start_time: dmp.call_start_time
+              ? new Date(dmp.call_start_time)
+              : null,
+            call_end_time: dmp.call_end_time
+              ? new Date(dmp.call_end_time)
+              : null,
             record_url: dmp.record_url,
             call_type: dmp.call_type,
             source: dmp.source,
@@ -312,138 +109,6 @@ const createDmpData = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-// const getDmpData = async (req, res) => {
-//   try {
-//     const page = parseInt(req.query.page) || 1;
-//     const pageSize = parseInt(req.query.pageSize) || 10;
-//     const search = req.query.search || "";
-//     const startDate = req.query.startDate ? req.query.startDate : null;
-//     const endDate = req.query.endDate ? req.query.endDate : null;
-//     const sortBy = req.query.sortBy || "date";
-//     const sortDirection = req.query.sortDirection || "desc";
-//     const sortOrder = sortDirection === "asc" ? 1 : -1;
-
-   
-//     if (page <= 0 || pageSize <= 0) {
-//       return res.status(400).json({ error: "Invalid pagination parameters" });
-//     }
-
-//     const skip = (page - 1) * pageSize;
-
-   
-//     const searchFilter = search
-//       ? {
-//           $or: [
-//             { phone: { $regex: search, $options: "i" } },
-//             { source: { $regex: search, $options: "i" } },
-//             { agent: { $regex: search, $options: "i" } },
-//           ],
-//         }
-//       : {};
-
-  
-//     if (startDate && endDate) {
-//       searchFilter.date = {
-//         $gte: startDate,
-//         $lte: endDate,
-//       };
-//     }
-
-//     console.log("Search Filter:", searchFilter);
-
-//     const dmps = await Dmp.find(searchFilter)
-//       .sort({ [sortBy]: sortOrder, _id: -1 })
-//       .skip(skip)
-//       .limit(pageSize);
-
-//     const totalDmps = await Dmp.countDocuments(searchFilter);
-//     const totalPages = Math.ceil(totalDmps / pageSize);
-
-//     res.status(200).json({
-//       dmps,
-//       currentPage: page,
-//       totalPages,
-//       totalDmps,
-//     });
-//   } catch (error) {
-//     console.error("Error occurred while fetching DMP data:", error);
-//     return res.status(500).json({ error: "Internal Server Error" });
-//   }
-// };
-
-
-// const getDmpData = async (req, res) => {
-//   try {
-//     const page = parseInt(req.query.page) || 1;
-//     const pageSize = parseInt(req.query.pageSize) || 10;
-//     const search = req.query.search || "";
-//     const startDate = req.query.startDate || null;
-//     const endDate = req.query.endDate || null;
-//     const sortBy = req.query.sortBy || "date";
-//     const sortDirection = req.query.sortDirection || "desc";
-//     const sortOrder = sortDirection === "asc" ? 1 : -1;
-
-//     if (page <= 0 || pageSize <= 0) {
-//       return res.status(400).json({ error: "Invalid pagination parameters" });
-//     }
-
-//     const skip = (page - 1) * pageSize;
-
-//     // Build search filter
-//     const searchFilter = search
-//       ? {
-//           $or: [
-//             { phone: { $regex: search, $options: "i" } },
-//             { source: { $regex: search, $options: "i" } },
-//             { agent_username: { $regex: search, $options: "i" } },
-//             { cust_name: { $regex: search, $options: "i" } },
-//             { first_disposition: { $regex: search, $options: "i" } },
-//           ],
-//         }
-//       : {};
-
-//     if (startDate && endDate) {
-//       searchFilter.date = {
-//         $gte: startDate,
-//         $lte: endDate,
-//       };
-//     }
-
-//     // Debug: log the search filter
-//     console.log("Search Filter:", JSON.stringify(searchFilter, null, 2));
-
-//     // Query the database
-//     const dmps = await Dmp.find(searchFilter)
-//       .sort({ [sortBy]: sortOrder, _id: -1 })
-//       .skip(skip)
-//       .limit(pageSize);
-
-//     // Log the result count
-//     const totalDmps = await Dmp.countDocuments(searchFilter);
-//     console.log("Total DMPs matching filter:", totalDmps);
-
-//     const totalPages = Math.ceil(totalDmps / pageSize);
-
-//     res.status(200).json({
-//       dmps,
-//       currentPage: page,
-//       totalPages,
-//       totalDmps,
-//     });
-//   } catch (error) {
-//     console.error("Error occurred while fetching DMP data:", error);
-//     return res.status(500).json({ error: "Internal Server Error" });
-//   }
-// };
-
-
 // const getDmpData = async (req, res) => {
 //   try {
 //     const page = parseInt(req.query.page) || 1;
@@ -464,7 +129,7 @@ const createDmpData = async (req, res) => {
 
 //     // Handle date filtering based on preset
 //     if (filterPreset) {
-//       const currentDate = new Date();
+//       const currentDate = new Date(); // Declare currentDate here
 //       switch (filterPreset) {
 //         case "last-7-days":
 //           startDate = new Date(currentDate);
@@ -473,7 +138,7 @@ const createDmpData = async (req, res) => {
 //           endDate = new Date(currentDate);
 //           endDate.setUTCHours(23, 59, 59, 999); // End of the current day
 //           break;
-        
+
 //         case "last-14-days":
 //           startDate = new Date(currentDate);
 //           startDate.setDate(currentDate.getDate() - 14);
@@ -481,7 +146,7 @@ const createDmpData = async (req, res) => {
 //           endDate = new Date(currentDate);
 //           endDate.setUTCHours(23, 59, 59, 999); // End of the current day
 //           break;
-        
+
 //         case "last-30-days":
 //           startDate = new Date(currentDate);
 //           startDate.setDate(currentDate.getDate() - 30);
@@ -490,61 +155,74 @@ const createDmpData = async (req, res) => {
 //           endDate.setUTCHours(23, 59, 59, 999); // End of the current day
 //           break;
 
-//           case "yesterday":
-//             const currentDate = new Date();
-//             startDate = new Date(currentDate);
-//             startDate.setDate(currentDate.getDate() - 1);
-//             startDate.setUTCHours(0, 0, 0, 0); // Start of yesterday in UTC
-          
-//             endDate = new Date(startDate);
-//             endDate.setUTCHours(23, 59, 59, 999); // End of yesterday in UTC
-//             break;
-          
+//         case "yesterday":
+//           // Use the outer currentDate, do not redeclare it
+//           startDate = new Date(currentDate);
+//           startDate.setDate(currentDate.getDate() - 1);
+//           startDate.setUTCHours(0, 0, 0, 0); 
+//           endDate = new Date(startDate);
+//           endDate.setUTCHours(23, 59, 59, 999); 
+//           break;
+
 //         case "custom-range":
 //           if (startDate && endDate) {
-//             startDate = new Date(startDate);
-//             endDate = new Date(endDate);
+//             startDate = new Date(startDate); // Ensure it's a Date object
+//             endDate = new Date(endDate); // Ensure it's a Date object
 //             endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+//           } else {
+//             return res.status(400).json({
+//               error: "Both startDate and endDate are required for custom-range",
+//             });
 //           }
 //           break;
+
 //         default:
 //           break;
 //       }
 //     }
-//     console.log("Start Date:", startDate);
-//     console.log("End Date:", endDate);
-    
+
+//     // Debug: log the date ranges
+   
+
 //     // Convert startDate and endDate to Date objects if they are provided
-//     if (startDate) startDate = new Date(startDate); // Ensure it's a Date object
+//     if (startDate && isNaN(new Date(startDate).getTime())) {
+//       return res.status(400).json({ error: "Invalid startDate" });
+//     }
+//     if (endDate && isNaN(new Date(endDate).getTime())) {
+//       return res.status(400).json({ error: "Invalid endDate" });
+//     }
+
+//     if (startDate) startDate = new Date(startDate);
 //     if (endDate) {
-//       endDate = new Date(endDate); // Ensure it's a Date object
-//       // Set endDate to the end of the day (23:59:59.999)
-//       endDate.setUTCHours(23, 59, 59, 999);
+//       endDate = new Date(endDate);
+//       endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
 //     }
 
 //     // Build search filter
+//     const searchFields = [
+//       "phone",
+//       "source",
+//       "agent_username",
+//       "cust_name",
+//       "first_disposition",
+//     ];
 //     const searchFilter = search
 //       ? {
-//           $or: [
-//             { phone: { $regex: search, $options: "i" } },
-//             { source: { $regex: search, $options: "i" } },
-//             { agent_username: { $regex: search, $options: "i" } },
-//             { cust_name: { $regex: search, $options: "i" } },
-//             { first_disposition: { $regex: search, $options: "i" } },
-//           ],
+//           $or: searchFields.map((field) => ({
+//             [field]: { $regex: search, $options: "i" },
+//           })),
 //         }
 //       : {};
 
-//     // Add date and time filter if both startDate and endDate are provided
 //     if (startDate && endDate) {
 //       searchFilter.call_start_time = {
-//         $gte: startDate, // Greater than or equal to the start date and time
-//         $lte: endDate,   // Less than or equal to the end date and time
+//         $gte: startDate,
+//         $lte: endDate,
 //       };
 //     }
 
 //     // Debug: log the search filter
-//     console.log("Search Filter:", JSON.stringify(searchFilter, null, 2));
+//     // console.log("Search Filter:", JSON.stringify(searchFilter, null, 2));
 
 //     // Query the database
 //     const dmps = await Dmp.find(searchFilter)
@@ -554,7 +232,28 @@ const createDmpData = async (req, res) => {
 
 //     // Log the result count
 //     const totalDmps = await Dmp.countDocuments(searchFilter);
-//     console.log("Total DMPs matching filter:", totalDmps);
+//     // console.log("Total DMPs matching filter:", totalDmps);
+
+//     const yesterday = new Date();
+//     yesterday.setDate(yesterday.getDate() - 1);
+
+//     const startOfYesterday = new Date(yesterday);
+//     startOfYesterday.setHours(0, 0, 0, 0);
+
+//     const startOfToday = new Date();
+//     startOfToday.setHours(0, 0, 0, 0);
+
+//     const yesterdayFilter = {
+//       call_start_time: {
+//         $gte: startOfYesterday,
+//         $lt: startOfToday,
+//       },
+//     };
+
+//     const yesterdayCount = await Dmp.countDocuments(yesterdayFilter);
+//     console.log("Yesterday's DMP count:", yesterdayCount);
+//     console.log("startOfYesterday", startOfYesterday);
+//     console.log("startOfToday", startOfToday);
 
 //     const totalPages = Math.ceil(totalDmps / pageSize);
 
@@ -563,12 +262,16 @@ const createDmpData = async (req, res) => {
 //       currentPage: page,
 //       totalPages,
 //       totalDmps,
+//       yesterdayCount,
 //     });
 //   } catch (error) {
 //     console.error("Error occurred while fetching DMP data:", error);
-//     return res.status(500).json({ error: "Internal Server Error" });
+//     return res
+//       .status(500)
+//       .json({ error: "Internal Server Error", details: error.message });
 //   }
 // };
+
 
 const getDmpData = async (req, res) => {
   try {
@@ -577,7 +280,7 @@ const getDmpData = async (req, res) => {
     const search = req.query.search || "";
     let startDate = req.query.startDate || null;
     let endDate = req.query.endDate || null;
-    const filterPreset = req.query.filterPreset || ""; // Added for dynamic filters like "last-7-days"
+    const filterPreset = req.query.filterPreset || "";
     const sortBy = req.query.sortBy || "date";
     const sortDirection = req.query.sortDirection || "desc";
     const sortOrder = sortDirection === "asc" ? 1 : -1;
@@ -617,12 +320,11 @@ const getDmpData = async (req, res) => {
           break;
 
         case "yesterday":
-          // Use the outer currentDate, do not redeclare it
           startDate = new Date(currentDate);
           startDate.setDate(currentDate.getDate() - 1);
-          startDate.setUTCHours(0, 0, 0, 0); // Start of yesterday in UTC
+          startDate.setUTCHours(0, 0, 0, 0); // Start of yesterday (UTC)
           endDate = new Date(startDate);
-          endDate.setUTCHours(23, 59, 59, 999); // End of yesterday in UTC
+          endDate.setUTCHours(23, 59, 59, 999); // End of yesterday (UTC)
           break;
 
         case "custom-range":
@@ -631,7 +333,9 @@ const getDmpData = async (req, res) => {
             endDate = new Date(endDate); // Ensure it's a Date object
             endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
           } else {
-            return res.status(400).json({ error: "Both startDate and endDate are required for custom-range" });
+            return res.status(400).json({
+              error: "Both startDate and endDate are required for custom-range",
+            });
           }
           break;
 
@@ -639,11 +343,6 @@ const getDmpData = async (req, res) => {
           break;
       }
     }
-
-    // Debug: log the date ranges
-    console.log("Filter Preset:", filterPreset);
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
 
     // Convert startDate and endDate to Date objects if they are provided
     if (startDate && isNaN(new Date(startDate).getTime())) {
@@ -660,7 +359,13 @@ const getDmpData = async (req, res) => {
     }
 
     // Build search filter
-    const searchFields = ["phone", "source", "agent_username", "cust_name", "first_disposition"];
+    const searchFields = [
+      "phone",
+      "source",
+      "agent_username",
+      "cust_name",
+      "first_disposition",
+    ];
     const searchFilter = search
       ? {
           $or: searchFields.map((field) => ({
@@ -673,12 +378,9 @@ const getDmpData = async (req, res) => {
     if (startDate && endDate) {
       searchFilter.call_start_time = {
         $gte: startDate, // Greater than or equal to the start date and time
-        $lte: endDate,   // Less than or equal to the end date and time
+        $lte: endDate, // Less than or equal to the end date and time
       };
     }
-
-    // Debug: log the search filter
-    console.log("Search Filter:", JSON.stringify(searchFilter, null, 2));
 
     // Query the database
     const dmps = await Dmp.find(searchFilter)
@@ -688,23 +390,41 @@ const getDmpData = async (req, res) => {
 
     // Log the result count
     const totalDmps = await Dmp.countDocuments(searchFilter);
-    console.log("Total DMPs matching filter:", totalDmps);
-
     const totalPages = Math.ceil(totalDmps / pageSize);
+
+    // Calculate yesterday's count
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const startOfYesterday = new Date(yesterday);
+    startOfYesterday.setUTCHours(0, 0, 0, 0); // Start of yesterday (UTC)
+
+    const endOfYesterday = new Date(startOfYesterday);
+    endOfYesterday.setUTCHours(23, 59, 59, 999); // End of yesterday (UTC)
+
+    const yesterdayFilter = {
+      call_start_time: {
+        $gte: startOfYesterday,
+        $lte: endOfYesterday,
+      },
+    };
+
+    const yesterdayCount = await Dmp.countDocuments(yesterdayFilter);
 
     res.status(200).json({
       dmps,
       currentPage: page,
       totalPages,
       totalDmps,
+      yesterdayCount,
     });
   } catch (error) {
     console.error("Error occurred while fetching DMP data:", error);
-    return res.status(500).json({ error: "Internal Server Error", details: error.message });
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
   }
 };
-
-
 
 
 module.exports = {

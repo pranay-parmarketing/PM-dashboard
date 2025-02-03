@@ -116,6 +116,7 @@ const LeadSent = () => {
             sortOrder: "asc",
             startDate: startDate,
             endDate: endDate,
+            filterPreset: filters.datePreset,
           },
         });
 
@@ -159,122 +160,101 @@ const LeadSent = () => {
 
   const { datePreset, format } = filters;
 
-  const filterByDate = (details, preset) => {
+  const filterByDate = (details, preset, startDate = null, endDate = null) => {
+    if (!Array.isArray(details) || details.length === 0) {
+        console.warn("No details available to filter");
+        return [];
+    }
+
     const currentDate = new Date();
     let filteredData = [];
 
-    if (!Array.isArray(details) || details.length === 0) {
-      console.warn("No details available to filter");
-      return [];
-    }
+    // Helper function to get UTC start of the day
+    const getUTCDate = (date) => {
+        const d = new Date(date);
+        d.setUTCHours(0, 0, 0, 0); // Convert to start of the day in UTC
+        return d;
+    };
+
+    // Helper function to get UTC end of the day
+    const getUTCEndOfDay = (date) => {
+        const d = new Date(date);
+        d.setUTCHours(23, 59, 59, 999); // Convert to end of the day in UTC
+        return d;
+    };
+
+    console.log("Current Date (UTC Start of the Day):", getUTCDate(currentDate));
 
     switch (preset) {
-      case "last-7-days": {
-        const last7Days = new Date();
-        last7Days.setDate(last7Days.getDate() - 7);
-        last7Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
-
-        filteredData = details.filter((detail) => {
-          const callStartDate = detail.call_start_time
-            ? new Date(detail.call_start_time)
-            : null;
-          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
-          return callStartDate && callStartDate >= last7Days; // Filter based on call_start_time
-        });
-        break;
-      }
-
-      case "last-14-days": {
-        const last14Days = new Date();
-        last14Days.setDate(last14Days.getDate() - 14);
-        last14Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
-
-        filteredData = details.filter((detail) => {
-          const callStartDate = detail.call_start_time
-            ? new Date(detail.call_start_time)
-            : null;
-          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
-          return callStartDate && callStartDate >= last14Days; // Filter based on call_start_time
-        });
-        break;
-      }
-
-      case "last-30-days": {
-        const last30Days = new Date();
-        last30Days.setDate(last30Days.getDate() - 30);
-        last30Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
-
-        filteredData = details.filter((detail) => {
-          const callStartDate = detail.call_start_time
-            ? new Date(detail.call_start_time)
-            : null;
-          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
-          return callStartDate && callStartDate >= last30Days; // Filter based on call_start_time
-        });
-        break;
-      }
-
-      case "yesterday": {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        yesterday.setHours(0, 0, 0, 0);
-
-        filteredData = details.filter((detail) => {
-          const callStartDate = detail.call_start_time
-            ? new Date(detail.call_start_time)
-            : null;
-          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Set the time part to 00:00:00 for comparison
-          return callStartDate && callStartDate >= yesterday;
-        });
-        break;
-      }
-
-      case "last-day": {
-        const lastDay = new Date();
-        lastDay.setDate(lastDay.getDate() - 1);
-        lastDay.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
-
-        filteredData = details.filter((detail) => {
-          const callStartDate = detail.call_start_time
-            ? new Date(detail.call_start_time)
-            : null;
-          if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
-          return callStartDate && callStartDate >= lastDay; // Filter based on call_start_time
-        });
-        break;
-      }
-
-      //
-
-      case "custom-range": {
-        if (startDate && endDate) {
-          const customStartDate = new Date(startDate);
-          const customEndDate = new Date(endDate);
-          customStartDate.setHours(0, 0, 0, 0); // Set start date to midnight
-          customEndDate.setHours(23, 59, 59, 999); // Set end date to just before midnight of the next day
-
-          filteredData = details.filter((detail) => {
-            const callStartDate = detail.call_start_time
-              ? new Date(detail.call_start_time)
-              : null;
-            return (
-              callStartDate &&
-              callStartDate >= customStartDate &&
-              callStartDate <= customEndDate
-            );
-          });
+        case "last-7-days": {
+            const last7Days = getUTCDate(currentDate);
+            last7Days.setUTCDate(last7Days.getUTCDate() - 7);
+            filteredData = details.filter(({ call_start_time }) => {
+                const callDate = call_start_time ? new Date(call_start_time) : null;
+                return callDate && callDate >= last7Days;
+            });
+            break;
         }
-        break;
-      }
 
-      default:
-        filteredData = details;
-        break;
+        case "last-14-days": {
+            const last14Days = getUTCDate(currentDate);
+            last14Days.setUTCDate(last14Days.getUTCDate() - 14);
+            filteredData = details.filter(({ call_start_time }) => {
+                const callDate = call_start_time ? new Date(call_start_time) : null;
+                return callDate && callDate >= last14Days;
+            });
+            break;
+        }
+
+        case "last-30-days": {
+            const last30Days = getUTCDate(currentDate);
+            last30Days.setUTCDate(last30Days.getUTCDate() - 30);
+            filteredData = details.filter(({ call_start_time }) => {
+                const callDate = call_start_time ? new Date(call_start_time) : null;
+                return callDate && callDate >= last30Days;
+            });
+            break;
+        }
+
+        case "yesterday": {
+            const yesterdayStart = getUTCDate(currentDate);
+            yesterdayStart.setUTCDate(yesterdayStart.getUTCDate() - 1); // Start of yesterday in UTC
+            const yesterdayEnd = getUTCEndOfDay(yesterdayStart); // End of yesterday in UTC
+
+            console.log("Yesterday Start (UTC):", yesterdayStart);
+            console.log("Yesterday End (UTC):", yesterdayEnd);
+
+            filteredData = details.filter(({ call_start_time }) => {
+                const callDate = call_start_time ? new Date(call_start_time) : null;
+                console.log("Checking call_start_time:", call_start_time, "Parsed as:", callDate);
+
+                // Compare UTC dates
+                return callDate && callDate >= yesterdayStart && callDate <= yesterdayEnd;
+            });
+            break;
+        }
+
+        case "custom-range": {
+            if (startDate && endDate) {
+                const customStartDate = getUTCDate(startDate); // Ensure start date is a Date object
+                const customEndDate = getUTCEndOfDay(endDate); // Ensure end date is a Date object
+
+                filteredData = details.filter(({ call_start_time }) => {
+                    const callDate = call_start_time ? new Date(call_start_time) : null;
+                    return callDate && callDate >= customStartDate && callDate <= customEndDate;
+                });
+            }
+            break;
+        }
+
+        default:
+            filteredData = details;
+            break;
     }
 
+    console.log(`Filtered Data (${preset}):`, filteredData);
     return filteredData;
-  };
-
+};
   const getFilteredData = () => {
     let dataToFilter = [];
 
