@@ -333,14 +333,16 @@ const PackSent = () => {
                           {index + 1 + currentPage * rowsPerPage}
                         </td>
                         <td className="px-4 py-2">
-                          {new Date(row.Created_Time).toLocaleDateString(
-                            "en-GB",
-                            {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                            }
-                          )}
+                          {row.Created_Time
+                            ? new Date(row.Created_Time).toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                }
+                              )
+                            : "N/A"}
                         </td>
                         <td className="px-4 py-2">
                           {row.zohosign__Lead?.name || "N/A"}
