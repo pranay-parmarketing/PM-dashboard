@@ -361,16 +361,17 @@ const PackSent = () => {
                           ) || "N/A"}
                         </td>
                         <td className="px-4 py-2">
-                        <td className="px-4 py-2">
-  {row.zohosign__Date_Completed
-    ? new Date(row.zohosign__Date_Completed).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-    : "N/A"}
-</td>
-
+                          <td className="px-4 py-2">
+                            {row.zohosign__Date_Completed
+                              ? new Date(
+                                  row.zohosign__Date_Completed
+                                ).toLocaleDateString("en-GB", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                })
+                              : "N/A"}
+                          </td>
                         </td>
                         <td className="px-4 py-2">
                           {row.zohosign__Document_Status || "N/A"}
