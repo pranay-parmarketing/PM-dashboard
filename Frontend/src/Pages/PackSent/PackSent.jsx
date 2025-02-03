@@ -351,14 +351,15 @@ const PackSent = () => {
                         <td className="px-4 py-2">N/A</td>{" "}
                         {/* No source field in JSON */}
                         <td className="px-4 py-2">
-                          {new Date(row.zohosign__Date_Sent).toLocaleDateString(
-                            "en-GB",
-                            {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                            }
-                          ) || "N/A"}
+                          {row.zohosign__Date_Sent
+                            ? new Date(
+                                row.zohosign__Date_Sent
+                              ).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              })
+                            : "N/A"}
                         </td>
                         <td className="px-4 py-2">
                           <td className="px-4 py-2">
