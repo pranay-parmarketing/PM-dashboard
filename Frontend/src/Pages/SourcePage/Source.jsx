@@ -1,114 +1,76 @@
-import React, { useEffect, useState } from "react";
-import Sidebar from "../../Components/Sidebar/Sidebar";
-import Navbar from "../../Components/Navbar/Navbar";
+import React, { useContext, useEffect, useState } from "react";
 import { MdFileUpload } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import ChooseFileModal from "../../Components/CustomModal/ChooseFileModal";
 import AddModal from "../../Components/CustomModal/AddModal";
-import "./Source.css";
+import { ApiTokenContext } from "../../context/Apicontext";
+import axios from "axios";
+import { MONGO_URI } from "../../Variables/Variables";
+import EditModal from "../../Components/CustomModal/EditModal";
+import SelectInputs from "../../Components/SelectInput/SelectInputs";
+import Pagination from "../../Components/Pagination/Pagination";
 
 const Source = () => {
-  const [mydata, setData] = useState([]);
+  // const [mydata, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [nextPage, setNextPage] = useState(null);
+  const [prevPage, setPrevPage] = useState(null);
+  //
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [paginatedDetails, setPaginatedDetails] = useState([]);
+  const [campaignDetails, setCampaignDetails] = useState([]);
+  //
+  const [mongoData, setMongoData] = useState({});
+  const [loading, setLoading] = useState(false);
+  //
+  const [totalPages, setTotalPages] = useState(0);
+  //
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [campaigns, setCampaigns] = useState([]);
+  const [leads, setLeads] = useState([]);
+  const [data, setData] = useState([]);
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
-  // Dummy data for the table
+  const { appsecret_proof, access_token, selectedAccount } =
+    useContext(ApiTokenContext);
 
-  // Dummy data for the table
-  const data = [
-    {
-      id: 1,
-      name: "WhatsApp Campaign",
-      fbAccountID: "23856451032910657",
-      fbAccountName: "LionLaw",
-      table: "Table1",
-    },
-    {
-      id: 2,
-      name: "WhatsApp Campaign",
-      fbAccountID: "23846635955920657",
-      fbAccountName: "LionLaw",
-      table: "Table2",
-    },
-    {
-      id: 3,
-      name: "WebConversion mum-ban",
-      fbAccountID: "23846616020680657",
-      fbAccountName: "LionLaw",
-      table: "Table3",
-    },
-    {
-      id: 4,
-      name: "UK Credit Card - LG Campaign",
-      fbAccountID: "23850599791490657",
-      fbAccountName: "LionLaw",
-      table: "Table4",
-    },
-    {
-      id: 5,
-      name: "U.K Campaign Testing – MSE",
-      fbAccountID: "120207992470810658",
-      fbAccountName: "LionLaw",
-      table: "Table5",
-    },
-    {
-      id: 6,
-      name: "U.K Campaign Testing",
-      fbAccountID: "23847077639820657",
-      fbAccountName: "LionLaw",
-      table: "Table6",
-    },
-    {
-      id: 7,
-      name: "U.K Campaign Remarketing WV - June",
-      fbAccountID: "23850533990450657",
-      fbAccountName: "LionLaw",
-      table: "Table7",
-    },
-    {
-      id: 8,
-      name: "U.K Campaign Remarketing WV",
-      fbAccountID: "23849756909710657",
-      fbAccountName: "LionLaw",
-      table: "Table8",
-    },
-    {
-      id: 9,
-      name: "TC Campaign - June",
-      fbAccountID: "120208996044880658",
-      fbAccountName: "LionLaw",
-      table: "Table9",
-    },
-    {
-      id: 10,
-      name: "TC Campaign - July",
-      fbAccountID: "120209447348510658",
-      fbAccountName: "LionLaw",
-      table: "Table10",
-    },
-  ];
+  const appSecretProof = appsecret_proof;
+  const accessToken = access_token;
 
-  useEffect(() => {
-    setData(data);
-  }, []);
+  // Function to save campaign data to MongoDB
+  const saveCampaignData = async (campaignData) => {
+    try {
+      const campaignsWithAccountId = campaignData.map((campaign) => ({
+        ...campaign,
+        account_id: selectedAccount?.id || null, // Add accountId from selectedAccount context
+      }));
 
-  const handleEdit = (row) => {
-    setSelectedRow(row);
-    setIsAddModalOpen(true);
-  };
-
-  const handleDelete = (id) => {
-    const newData = mydata.filter((item) => item.id !== id);
-    setData(newData);
+      const saveResponse = await axios.post(
+        `${MONGO_URI}/api/save-campaigns`,
+        campaignsWithAccountId,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (saveError) {
+      console.error(
+        "Error saving campaign data:",
+        saveError.response ? saveError.response.data : saveError.message
+      );
+    }
   };
 
   const handleAddNewCampaign = () => {
@@ -126,15 +88,187 @@ const Source = () => {
     if (!selectedFile) {
       setError("Please choose a valid file.");
     } else {
-      console.log("File saved:", selectedFile);
       setIsModalOpen(false);
     }
   };
 
-  // Filter data based on search input
-  const filteredData = mydata.filter((row) =>
-    row.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredData =
+    Array.isArray(data) && data.length > 0
+      ? data.filter(
+          (row) =>
+            (row.campaignName &&
+              row.campaignName.toLowerCase().includes(search.toLowerCase())) ||
+            (row.sourceMain &&
+              row.sourceMain.toLowerCase().includes(search.toLowerCase()))
+        )
+      : Array.isArray(data)
+      ? data.filter(
+          (row) =>
+            (row.campaignName &&
+              row.campaignName.toLowerCase().includes(search.toLowerCase())) ||
+            (row.sourceMain &&
+              row.sourceMain.toLowerCase().includes(search.toLowerCase()))
+        )
+      : [];
+
+  // Calculate total pages based on data length and rows per page
+  const totalCount = campaignDetails.length;
+
+  // Update paginated details when currentPage, rowsPerPage, or campaignDetails change
+  const updatePaginatedDetails = () => {
+    const startIndex = currentPage * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const currentPageDetails = campaignDetails.slice(startIndex, endIndex);
+    setPaginatedDetails(currentPageDetails);
+  };
+
+  useEffect(() => {
+    // Handle invalid currentPage or empty data
+    if (currentPage >= totalPages) {
+      setCurrentPage(totalPages - 1); // Reset to the last page
+    }
+
+    if (campaignDetails.length > 0 && currentPage < totalPages) {
+      updatePaginatedDetails();
+    } else {
+      setCurrentPage(0); // Reset to the first page if no data
+      updatePaginatedDetails();
+    }
+  }, [currentPage, rowsPerPage, campaignDetails, totalPages]);
+
+  // Handle navigation to the next page
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  // Handle navigation to the previous page
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  // Determine if pagination buttons should be disabled
+  const isNextButtonDisabled = currentPage >= totalPages - 1;
+  const isPrevButtonDisabled = currentPage <= 0;
+
+  useEffect(() => {
+    // Fetch campaigns from MongoDB
+    const fetchCampaigns = async () => {
+      try {
+        const response = await axios.get(
+          `${MONGO_URI}/api/save-campaigns/${selectedAccount.id}`
+        );
+
+        const fetchedCampaigns = Array.isArray(response.data)
+          ? response.data
+          : [response.data]; // Ensure data is an array
+
+        // Update state with fetched campaigns
+        setMongoData(fetchedCampaigns);
+        setCampaignDetails(fetchedCampaigns);
+
+        // Reset pagination based on the new data
+        setCurrentPage(0); // Start at the first page
+        const updatedTotalCount = fetchedCampaigns.length;
+        setTotalPages(Math.ceil(updatedTotalCount / rowsPerPage));
+      } catch (error) {
+        console.error("Error fetching campaigns:", error);
+      }
+    };
+
+    fetchCampaigns();
+  }, [selectedAccount, MONGO_URI, rowsPerPage]);
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(Number(event.target.value));
+    setCurrentPage(0);
+  };
+
+  //
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const response = await axios.get(
+          `${MONGO_URI}/api/save-campaigns/${selectedAccount.id}`
+        );
+
+        setCampaigns(response.data || []);
+      } catch (error) {
+        console.error("Error fetching campaigns:", error);
+        setCampaigns([]);
+      }
+    };
+
+    const fetchLeads = async () => {
+      try {
+        const response = await axios.get(`${MONGO_URI}/api/leads`, {
+          params: {
+            page: currentPage + 1,
+            pageSize: rowsPerPage,
+          },
+        });
+
+        setLeads(response.data.leads || []); // Ensure correct extraction
+      } catch (error) {
+        console.error("Error fetching leads:", error);
+        setLeads([]);
+      }
+    };
+
+    fetchCampaigns();
+    fetchLeads();
+  }, [selectedAccount, currentPage]);
+
+  //
+
+  useEffect(() => {
+    if (campaigns.length > 0 && leads.length > 0) {
+      // Create a map for quick campaign lookup
+      const campaignMap = new Map(
+        campaigns.map((campaign) => [
+          campaign.name.trim().toLowerCase(),
+          campaign.name,
+        ])
+      );
+
+      // Filter out leads that do not match any campaign
+      const mappedData = leads
+        .map((lead) => {
+          const leadSource = lead.source.trim().toLowerCase();
+          const matchingCampaignName = campaignMap.get(leadSource);
+
+          if (!matchingCampaignName) return null; // Skip unmatched leads
+
+          return {
+            campaignName: matchingCampaignName,
+            sourceMain: lead.source,
+          };
+        })
+        .filter(Boolean); // Remove null entries
+
+      // Add campaigns that don't match any lead sources
+      campaigns.forEach((campaign) => {
+        const campaignName = campaign.name.trim().toLowerCase();
+        if (
+          !mappedData.some(
+            (data) => data.campaignName.toLowerCase() === campaignName
+          )
+        ) {
+          mappedData.push({
+            campaignName: campaign.name,
+            sourceMain: "Organic",
+          });
+        }
+      });
+
+      // Set the mapped data
+      setData(mappedData);
+    }
+  }, [campaigns, leads]);
 
   return (
     <div className="home">
@@ -145,18 +279,34 @@ const Source = () => {
         onFileChange={handleFileChange}
         onFileSave={handleFileSave}
         errorMessage={error}
+        apiEndpoint={`${MONGO_URI}/api/save-Source`}
       />
+
       <AddModal
         Name={"Source"}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         selected={selectedRow}
+        apiEndpoint={`${MONGO_URI}/api/save-Source`}
       />
+
+      {/*  */}
+
+      <EditModal
+        Name="Source"
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        selected={selectedRow} // Pass only the selected user data here
+        id={selectedRow?.id} // Pass the user ID dynamically
+        endpoint={`${MONGO_URI}/api/save-Source/${selectedRow?._id}`} // Use dynamic endpoint with user ID
+      />
+
+      {/*  */}
 
       <div className="homeContainer">
         <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
           <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
-          Source
+            Source
           </h1>
           <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
             <button
@@ -176,33 +326,22 @@ const Source = () => {
           </div>
         </div>
 
-       <div
+        <div
           className={` md:w-[90%]   bg-white shadow-md rounded-lg p-4 ${
             isSidebarOpen ? "md:ml-16 lg:ml-16" : "md:ml-20"
           }`}
         >
-          <div className="table-header flex justify-between items-center mb-4">
-            <select
-              onChange={(e) => setRowsPerPage(parseInt(e.target.value))}
-              value={rowsPerPage}
-              className="border border-gray-300 p-2 rounded-md"
-            >
-              <option value={100}>Show 100 entries</option>
-              <option value={50}>Show 50 entries</option>
-              <option value={25}>Show 25 entries</option>
-              <option value={10}>Show 10 entries</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border border-gray-300 p-2 rounded-md"
-            />
-          </div>
+          <SelectInputs
+            name="Source"
+            rowsPerPage={rowsPerPage}
+            setSearch={setSearch}
+            search={search}
+            handleRowsPerPageChange={handleRowsPerPageChange}
+            setCurrentPage={setCurrentPage}
+          />
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-full table-auto">
+            <table className="min-w-max table-auto">
               <thead>
                 <tr className="bg-gray-800 text-white text-left">
                   <th>#</th>
@@ -212,56 +351,58 @@ const Source = () => {
                   <th>Actions</th>
                 </tr>
               </thead>
+
               <tbody className="text-gray-700">
-                {filteredData.slice(0, rowsPerPage).map((row, index) => (
-                  <tr key={row.id}>
-                    <td data-label="#">{index + 1}</td>
-                    <td data-label="Name">{row.name}</td>
-                    <td data-label="Facebook Account ID">{row.fbAccountID}</td>
-                    <td data-label="Facebook Account Name">
-                      {row.fbAccountName}
-                    </td>
-                     <td data-label="Actions">
-                      <button
-                        onClick={() => handleEdit(row)}
-                        className="edit-button mx-1"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(row.id)}
-                        className="delete-button mx-1"
-                      >
-                        <FaTrashAlt />
-                      </button>
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : Array.isArray(filteredData) && filteredData.length > 0 ? (
+                  filteredData
+                    .slice(
+                      currentPage * rowsPerPage,
+                      (currentPage + 1) * rowsPerPage
+                    )
+                    .map((row, index) => (
+                      <tr key={row.id}>
+                        <td data-label="#">
+                          {index + 1 + currentPage * rowsPerPage}
+                        </td>
+                        <td>{row.campaignName}</td>
+                        <td>{row.sourceMain}</td>
+                        <td data-label="Account">
+                          {selectedAccount?.name || "N/A"}
+                        </td>
+                        <td data-label="Actions">
+                          <button
+                            className="text-blue-500 mr-2"
+                            // onClick={() => handleEdit(row)}
+                          >
+                            <FaEdit />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="6">No data available</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
 
-          <div className="table-footer flex justify-between items-center mt-4">
-            <p className="text-gray-600">
-              Showing 1 to {Math.min(rowsPerPage, filteredData.length)} of{" "}
-              {filteredData.length} entries
-            </p>
-            <div className="pagination flex space-x-2">
-              <button
-                className="border rounded px-2 py-1"
-                disabled={filteredData.length <= rowsPerPage}
-              >
-                Prev
-              </button>
-              <span>1</span>
-              <button
-                className="border rounded px-2 py-1"
-                disabled={filteredData.length <= rowsPerPage}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination
+            handlePreviousPage={handlePreviousPage}
+            isPrevButtonDisabled={isPrevButtonDisabled}
+            currentPage={currentPage}
+            campaignDetails={campaignDetails}
+            rowsPerPage={rowsPerPage}
+            handleNextPage={handleNextPage}
+            isNextButtonDisabled={isNextButtonDisabled}
+          />
         </div>
       </div>
     </div>

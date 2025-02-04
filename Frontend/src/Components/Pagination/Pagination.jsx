@@ -26,9 +26,9 @@ const Pagination = ({
       </button>
       <span>
         Page {currentPage + 1} of{" "}
-        {name === "leadsent" || name === "dmp" || name === "leads"
+        {name === "leadsent" || name === "dmp" || name === "leads" || name === "campaign"
           ? apitotalpage
-          : Math.ceil(campaignDetails.length / rowsPerPage)}
+          : Math.ceil(campaignDetails?.length / rowsPerPage)}
       </span>
 
       <button

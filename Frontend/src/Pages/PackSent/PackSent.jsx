@@ -250,124 +250,108 @@ const PackSent = () => {
 
   return (
     <div className="home">
-      <div
-        className={`flex flex-col min-w-1 min-h-screen bg-gray-100 transition-all duration-300 `}
-      >
-        {/* <Navbar /> */}
-        <FilterModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          Base={false}
-          onApplyFilters={handleApplyFilters}
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-        />
+      <FilterModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        Base={false}
+        onApplyFilters={handleApplyFilters}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
+   
+          <div className="homeContainer">
+            <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
+              <h1 className="page-title text-2xl font-semibold text-gray-800 text-center md:text-left w-3/4">
+                Pack Sent
+              </h1>
+              <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
+                <button
+                  className="filter-btn flex items-center justify-center bg-green-600 text-white rounded-md px-4 py-2 hover:bg-green-700 transition duration-200 w-full md:w-auto"
+                  onClick={openModal}
+                >
+                  <IoMdAdd className="mr-2" />
+                  <span className="btn-text">New Filter</span>
+                </button>
+              </div>
 
-        <div className="homeContainer">
-          <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
-            <h1 className="page-title text-2xl font-semibold text-gray-800 text-center md:text-left w-3/4">
-              Pack Sent
-            </h1>
-            <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
+              {/*  */}
               <button
-                className="filter-btn flex items-center justify-center bg-green-600 text-white rounded-md px-4 py-2 hover:bg-green-700 transition duration-200 w-full md:w-auto"
-                onClick={openModal}
+                className="filter-btn flex items-center justify-center bg-red-600 text-white rounded-md px-4 py-2 hover:bg-red-700 transition duration-200 w-full md:w-auto"
+                onClick={clearCache}
               >
-                <IoMdAdd className="mr-2" />
-                <span className="btn-text">New Filter</span>
+                <IoMdRefresh className="mr-2" />
+                Refresh
               </button>
+              {/*  */}
             </div>
 
-            {/*  */}
-            <button
-              className="filter-btn flex items-center justify-center bg-red-600 text-white rounded-md px-4 py-2 hover:bg-red-700 transition duration-200 w-full md:w-auto"
-              onClick={clearCache}
+            <div
+              className={` w-[90%] bg-white shadow-md rounded-lg p-4 ${
+                isSidebarOpen ? "ml-16 lg:ml-16" : "ml-20"
+              }`}
             >
-              <IoMdRefresh className="mr-2" />
-              Refresh
-            </button>
-            {/*  */}
-          </div>
-
-          <div
-            className={` w-[90%] bg-white shadow-md rounded-lg p-4 ${
-              isSidebarOpen ? "ml-16 lg:ml-16" : "ml-20"
-            }`}
-          >
-            <SelectInputs
-              name="allpayments"
-              rowsPerPage={rowsPerPage}
-              setSearch={setSearch}
-              search={search}
-              handleRowsPerPageChange={handleRowsPerPageChange}
-              setCurrentPage={setCurrentPage}
-            />
-            <div className="overflow-x-auto">
-              <table className="min-w-max table-auto">
-                <thead>
-                  <tr className="bg-gray-800 text-white text-left">
-                    <th>#</th>
-                    <th>Lead Date</th>
-                    <th>Name </th>
-                    <th>Phone </th>
-                    <th>Email</th>
-                    <th>Source</th>
-                    <th>Sent Date</th>
-                    <th>Completed Date</th>
-                    <th>Status</th>
-                    <th>Agent Name</th>
-                    <th>DI</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(mydata) && mydata.length > 0 ? (
-                    filteredData.map((row, index) => (
-                      <tr key={index} className="border-b hover:bg-gray-50">
-                        {console.log(
-                          "row.zohosign__Lead?.name",
-                          row.zohosign__Lead
-                        )}
-                        <td data-label="#">
-                          {index + 1 + currentPage * rowsPerPage}
-                        </td>
-                        <td className="px-4 py-2">
-                          {row.Created_Time
-                            ? new Date(row.Created_Time).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                                }
-                              )
-                            : "N/A"}
-                        </td>
-                        <td className="px-4 py-2">
-                          {row.zohosign__Lead?.name || "N/A"}
-                        </td>
-                        <td className="px-4 py-2">N/A</td>{" "}
-                        {/* No phone field in JSON */}
-                        <td className="px-4 py-2">{row.Email || "N/A"}</td>
-                        <td className="px-4 py-2">N/A</td>{" "}
-                        {/* No source field in JSON */}
-                        <td className="px-4 py-2">
-                          {row.zohosign__Date_Sent
-                            ? new Date(
-                                row.zohosign__Date_Sent
-                              ).toLocaleDateString("en-GB", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                              })
-                            : "N/A"}
-                        </td>
-                        <td className="px-4 py-2">
+              <SelectInputs
+                name="allpayments"
+                rowsPerPage={rowsPerPage}
+                setSearch={setSearch}
+                search={search}
+                handleRowsPerPageChange={handleRowsPerPageChange}
+                setCurrentPage={setCurrentPage}
+              />
+              <div className="overflow-x-auto">
+                <table className="min-w-max table-auto">
+                  <thead>
+                    <tr className="bg-gray-800 text-white text-left">
+                      <th>#</th>
+                      <th>Lead Date</th>
+                      <th>Name </th>
+                      <th>Phone </th>
+                      <th>Email</th>
+                      <th>Source</th>
+                      <th>Sent Date</th>
+                      <th>Completed Date</th>
+                      <th>Status</th>
+                      <th>Agent Name</th>
+                      <th>DI</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.isArray(mydata) && mydata.length > 0 ? (
+                      filteredData.map((row, index) => (
+                        <tr key={index} className="border-b hover:bg-gray-50">
+                          {console.log(
+                            "row.zohosign__Lead?.name",
+                            row.zohosign__Lead
+                          )}
+                          <td data-label="#">
+                            {index + 1 + currentPage * rowsPerPage}
+                          </td>
                           <td className="px-4 py-2">
-                            {row.zohosign__Date_Completed
+                            {row.Created_Time
+                              ? new Date(row.Created_Time).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  }
+                                )
+                              : "N/A"}
+                          </td>
+                          <td className="px-4 py-2">
+                            {row.zohosign__Lead?.name || "N/A"}
+                          </td>
+                          <td className="px-4 py-2">N/A</td>{" "}
+                          {/* No phone field in JSON */}
+                          <td className="px-4 py-2">{row.Email || "N/A"}</td>
+                          <td className="px-4 py-2">N/A</td>{" "}
+                          {/* No source field in JSON */}
+                          <td className="px-4 py-2">
+                            {row.zohosign__Date_Sent
                               ? new Date(
-                                  row.zohosign__Date_Completed
+                                  row.zohosign__Date_Sent
                                 ).toLocaleDateString("en-GB", {
                                   day: "2-digit",
                                   month: "2-digit",
@@ -375,41 +359,53 @@ const PackSent = () => {
                                 })
                               : "N/A"}
                           </td>
+                          <td className="px-4 py-2">
+                            <td className="px-4 py-2">
+                              {row.zohosign__Date_Completed
+                                ? new Date(
+                                    row.zohosign__Date_Completed
+                                  ).toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  })
+                                : "N/A"}
+                            </td>
+                          </td>
+                          <td className="px-4 py-2">
+                            {row.zohosign__Document_Status || "N/A"}
+                          </td>
+                          <td className="px-4 py-2">
+                            {row.Owner?.name || "N/A"}
+                          </td>
+                          <td className="px-4 py-2">N/A</td>{" "}
+                          {/* No DI field in JSON */}
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="18" className="text-center py-2">
+                          No payment data available
                         </td>
-                        <td className="px-4 py-2">
-                          {row.zohosign__Document_Status || "N/A"}
-                        </td>
-                        <td className="px-4 py-2">
-                          {row.Owner?.name || "N/A"}
-                        </td>
-                        <td className="px-4 py-2">N/A</td>{" "}
-                        {/* No DI field in JSON */}
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="18" className="text-center py-2">
-                        No payment data available
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    )}
+                  </tbody>
+                </table>
+              </div>
 
-            <Pagination
-              handlePreviousPage={handlePreviousPage}
-              isPrevButtonDisabled={isPrevButtonDisabled}
-              currentPage={currentPage}
-              campaignDetails={campaignDetails}
-              rowsPerPage={rowsPerPage}
-              handleNextPage={handleNextPage}
-              isNextButtonDisabled={isNextButtonDisabled}
-            />
+              <Pagination
+                handlePreviousPage={handlePreviousPage}
+                isPrevButtonDisabled={isPrevButtonDisabled}
+                currentPage={currentPage}
+                campaignDetails={campaignDetails}
+                rowsPerPage={rowsPerPage}
+                handleNextPage={handleNextPage}
+                isNextButtonDisabled={isNextButtonDisabled}
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      
   );
 };
 
