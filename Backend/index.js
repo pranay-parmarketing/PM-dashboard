@@ -17,6 +17,7 @@ const authtokenRoutes = require('./routes/authtoken.js');
 const leadsRoute = require('./routes/leadsRoute.js'); 
 const dmpRoute = require('./routes/dmpRoute.js'); 
 const sentleadRoute = require('./routes/sentlead.js'); 
+const sourceRoute = require('./routes/sourceRoute.js'); 
 
 
 const app = express();
@@ -49,6 +50,7 @@ app.use('/api', utmRoutes);
 // 
 
 app.use('/api/leads',leadsRoute)
+app.use('/api/source',sourceRoute)
 app.use('/api/dmp',dmpRoute)
 app.use('/api/sent-leads',sentleadRoute)
 
