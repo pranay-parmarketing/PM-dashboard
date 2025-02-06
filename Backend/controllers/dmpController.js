@@ -1,6 +1,7 @@
 const multer = require("multer");
 const XLSX = require("xlsx");
 const Dmp = require("../models/Dmp");
+const Leads = require("../models/Leads");
 
 const upload = multer({ storage: multer.memoryStorage() }).single("excelFile");
 
@@ -116,7 +117,7 @@ const createDmpData = async (req, res) => {
 //     const search = req.query.search || "";
 //     let startDate = req.query.startDate || null;
 //     let endDate = req.query.endDate || null;
-//     const filterPreset = req.query.filterPreset || ""; // Added for dynamic filters like "last-7-days"
+//     const filterPreset = req.query.filterPreset || "";
 //     const sortBy = req.query.sortBy || "date";
 //     const sortDirection = req.query.sortDirection || "desc";
 //     const sortOrder = sortDirection === "asc" ? 1 : -1;
@@ -156,12 +157,11 @@ const createDmpData = async (req, res) => {
 //           break;
 
 //         case "yesterday":
-//           // Use the outer currentDate, do not redeclare it
 //           startDate = new Date(currentDate);
 //           startDate.setDate(currentDate.getDate() - 1);
-//           startDate.setUTCHours(0, 0, 0, 0); 
+//           startDate.setUTCHours(0, 0, 0, 0); // Start of yesterday (UTC)
 //           endDate = new Date(startDate);
-//           endDate.setUTCHours(23, 59, 59, 999); 
+//           endDate.setUTCHours(23, 59, 59, 999); // End of yesterday (UTC)
 //           break;
 
 //         case "custom-range":
@@ -180,9 +180,6 @@ const createDmpData = async (req, res) => {
 //           break;
 //       }
 //     }
-
-//     // Debug: log the date ranges
-   
 
 //     // Convert startDate and endDate to Date objects if they are provided
 //     if (startDate && isNaN(new Date(startDate).getTime())) {
@@ -214,15 +211,13 @@ const createDmpData = async (req, res) => {
 //         }
 //       : {};
 
+//     // Add date and time filter if both startDate and endDate are provided
 //     if (startDate && endDate) {
 //       searchFilter.call_start_time = {
-//         $gte: startDate,
-//         $lte: endDate,
+//         $gte: startDate, // Greater than or equal to the start date and time
+//         $lte: endDate, // Less than or equal to the end date and time
 //       };
 //     }
-
-//     // Debug: log the search filter
-//     // console.log("Search Filter:", JSON.stringify(searchFilter, null, 2));
 
 //     // Query the database
 //     const dmps = await Dmp.find(searchFilter)
@@ -232,30 +227,26 @@ const createDmpData = async (req, res) => {
 
 //     // Log the result count
 //     const totalDmps = await Dmp.countDocuments(searchFilter);
-//     // console.log("Total DMPs matching filter:", totalDmps);
+//     const totalPages = Math.ceil(totalDmps / pageSize);
 
+//     // Calculate yesterday's count
 //     const yesterday = new Date();
 //     yesterday.setDate(yesterday.getDate() - 1);
 
 //     const startOfYesterday = new Date(yesterday);
-//     startOfYesterday.setHours(0, 0, 0, 0);
+//     startOfYesterday.setUTCHours(0, 0, 0, 0); // Start of yesterday (UTC)
 
-//     const startOfToday = new Date();
-//     startOfToday.setHours(0, 0, 0, 0);
+//     const endOfYesterday = new Date(startOfYesterday);
+//     endOfYesterday.setUTCHours(23, 59, 59, 999); // End of yesterday (UTC)
 
 //     const yesterdayFilter = {
 //       call_start_time: {
 //         $gte: startOfYesterday,
-//         $lt: startOfToday,
+//         $lte: endOfYesterday,
 //       },
 //     };
 
 //     const yesterdayCount = await Dmp.countDocuments(yesterdayFilter);
-//     console.log("Yesterday's DMP count:", yesterdayCount);
-//     console.log("startOfYesterday", startOfYesterday);
-//     console.log("startOfToday", startOfToday);
-
-//     const totalPages = Math.ceil(totalDmps / pageSize);
 
 //     res.status(200).json({
 //       dmps,
@@ -271,7 +262,6 @@ const createDmpData = async (req, res) => {
 //       .json({ error: "Internal Server Error", details: error.message });
 //   }
 // };
-
 
 const getDmpData = async (req, res) => {
   try {
@@ -291,60 +281,52 @@ const getDmpData = async (req, res) => {
 
     const skip = (page - 1) * pageSize;
 
-    // Handle date filtering based on preset
+    // Date filtering logic...
     if (filterPreset) {
-      const currentDate = new Date(); // Declare currentDate here
+      const currentDate = new Date();
       switch (filterPreset) {
         case "last-7-days":
           startDate = new Date(currentDate);
           startDate.setDate(currentDate.getDate() - 7);
-          startDate.setUTCHours(0, 0, 0, 0); // Start of the day 7 days ago
+          startDate.setUTCHours(0, 0, 0, 0);
           endDate = new Date(currentDate);
-          endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+          endDate.setUTCHours(23, 59, 59, 999);
           break;
-
         case "last-14-days":
           startDate = new Date(currentDate);
           startDate.setDate(currentDate.getDate() - 14);
-          startDate.setUTCHours(0, 0, 0, 0); // Start of the day 14 days ago
+          startDate.setUTCHours(0, 0, 0, 0);
           endDate = new Date(currentDate);
-          endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+          endDate.setUTCHours(23, 59, 59, 999);
           break;
-
         case "last-30-days":
           startDate = new Date(currentDate);
           startDate.setDate(currentDate.getDate() - 30);
-          startDate.setUTCHours(0, 0, 0, 0); // Start of the day 30 days ago
+          startDate.setUTCHours(0, 0, 0, 0);
           endDate = new Date(currentDate);
-          endDate.setUTCHours(23, 59, 59, 999); // End of the current day
+          endDate.setUTCHours(23, 59, 59, 999);
           break;
-
         case "yesterday":
           startDate = new Date(currentDate);
           startDate.setDate(currentDate.getDate() - 1);
-          startDate.setUTCHours(0, 0, 0, 0); // Start of yesterday (UTC)
+          startDate.setUTCHours(0, 0, 0, 0);
           endDate = new Date(startDate);
-          endDate.setUTCHours(23, 59, 59, 999); // End of yesterday (UTC)
+          endDate.setUTCHours(23, 59, 59, 999);
           break;
-
         case "custom-range":
           if (startDate && endDate) {
-            startDate = new Date(startDate); // Ensure it's a Date object
-            endDate = new Date(endDate); // Ensure it's a Date object
-            endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+            startDate = new Date(startDate);
+            endDate = new Date(endDate);
+            endDate.setUTCHours(23, 59, 59, 999);
           } else {
             return res.status(400).json({
               error: "Both startDate and endDate are required for custom-range",
             });
           }
           break;
-
-        default:
-          break;
       }
     }
 
-    // Convert startDate and endDate to Date objects if they are provided
     if (startDate && isNaN(new Date(startDate).getTime())) {
       return res.status(400).json({ error: "Invalid startDate" });
     }
@@ -355,10 +337,10 @@ const getDmpData = async (req, res) => {
     if (startDate) startDate = new Date(startDate);
     if (endDate) {
       endDate = new Date(endDate);
-      endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+      endDate.setUTCHours(23, 59, 59, 999);
     }
 
-    // Build search filter
+    // Search filter
     const searchFields = [
       "phone",
       "source",
@@ -374,33 +356,43 @@ const getDmpData = async (req, res) => {
         }
       : {};
 
-    // Add date and time filter if both startDate and endDate are provided
     if (startDate && endDate) {
       searchFilter.call_start_time = {
-        $gte: startDate, // Greater than or equal to the start date and time
-        $lte: endDate, // Less than or equal to the end date and time
+        $gte: startDate,
+        $lte: endDate,
       };
     }
 
-    // Query the database
-    const dmps = await Dmp.find(searchFilter)
+    // Query DMP data
+    let dmps = await Dmp.find(searchFilter)
       .sort({ [sortBy]: sortOrder, _id: -1 })
       .skip(skip)
       .limit(pageSize);
 
-    // Log the result count
+    // Fetch Leads and match with DMPs
+    const leadPhones = dmps.map((dmp) => dmp.phone);
+    const leads = await Leads.find({ phone: { $in: leadPhones } });
+
+    // Add lead_date if a matching lead exists
+    dmps = dmps.map((dmp) => {
+      const lead = leads.find((lead) => lead.phone === dmp.phone);
+      return {
+        ...dmp._doc, // Spread existing DMP data
+        lead_date: lead ? lead.createdOn : null, // Add lead_date from Lead model
+      };
+    });
+
+    // Get total count of documents
     const totalDmps = await Dmp.countDocuments(searchFilter);
     const totalPages = Math.ceil(totalDmps / pageSize);
 
     // Calculate yesterday's count
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-
     const startOfYesterday = new Date(yesterday);
-    startOfYesterday.setUTCHours(0, 0, 0, 0); // Start of yesterday (UTC)
-
+    startOfYesterday.setUTCHours(0, 0, 0, 0);
     const endOfYesterday = new Date(startOfYesterday);
-    endOfYesterday.setUTCHours(23, 59, 59, 999); // End of yesterday (UTC)
+    endOfYesterday.setUTCHours(23, 59, 59, 999);
 
     const yesterdayFilter = {
       call_start_time: {
@@ -420,11 +412,13 @@ const getDmpData = async (req, res) => {
     });
   } catch (error) {
     console.error("Error occurred while fetching DMP data:", error);
-    return res
-      .status(500)
-      .json({ error: "Internal Server Error", details: error.message });
+    return res.status(500).json({
+      error: "Internal Server Error",
+      details: error.message,
+    });
   }
 };
+
 
 
 module.exports = {

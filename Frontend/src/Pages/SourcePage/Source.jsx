@@ -31,38 +31,37 @@ const Source = () => {
   // Fetch the source data with caching and expiration logic
   useEffect(() => {
     if (!selectedAccount?.id) return;
-
+  
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Check if data is in localStorage and valid (less than 6 hours old)
-        const cachedData = localStorage.getItem("allSourceData");
-        const cachedTimestamp = localStorage.getItem("allSourceDataTimestamp");
-
+        // Check if account-specific data is in localStorage and valid (less than 6 hours old)
+        const cacheKey = `allSourceData_${selectedAccount.id}`;
+        const timestampKey = `allSourceDataTimestamp_${selectedAccount.id}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        const cachedTimestamp = localStorage.getItem(timestampKey);
+  
         const now = Date.now();
         const sixHoursInMs = 6 * 60 * 60 * 1000;
-
-        if (
-          cachedData &&
-          cachedTimestamp &&
-          now - cachedTimestamp < sixHoursInMs
-        ) {
-          // Use cached data if it is still valid
+  
+        if (cachedData && cachedTimestamp && now - cachedTimestamp < sixHoursInMs) {
+          // Use cached data if valid
           const sourceData = JSON.parse(cachedData);
           setAllSourceData(sourceData);
           setFilteredData(sourceData);
         } else {
-          // Fetch fresh data from API if cached data is expired or not present
+          // Fetch fresh data for the selected account
           const sourceRes = await axios.get(`${MONGO_URI}/api/source`, {
-            params: { adsName: "All" },
+            params: { accountId: selectedAccount.id },  // Fetch only selected account data
           });
+  
           const sourceData = sourceRes.data.leads || [];
           setAllSourceData(sourceData);
           setFilteredData(sourceData);
-
-          // Store the fetched data and timestamp in localStorage
-          localStorage.setItem("allSourceData", JSON.stringify(sourceData));
-          localStorage.setItem("allSourceDataTimestamp", now);
+  
+          // Cache the new data
+          localStorage.setItem(cacheKey, JSON.stringify(sourceData));
+          localStorage.setItem(timestampKey, now);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -70,9 +69,11 @@ const Source = () => {
         setLoading(false);
       }
     };
-
+  
     fetchData();
-  }, [selectedAccount]);
+  }, [selectedAccount]);  // Trigger effect only when selectedAccount changes
+  
+  
 
   // Filter the data based on search query, ensuring allSourceData is not undefined
   useEffect(() => {
@@ -137,6 +138,7 @@ const Source = () => {
                   <th>Campaign Name</th>
                   <th>Source</th>
                   <th>Adset Name</th>
+                  <th>Account</th>
                 </tr>
               </thead>
 
@@ -159,6 +161,7 @@ const Source = () => {
                         <td>{row.campaign_name}</td>
                         <td>{row.source}</td>
                         <td>{row.adsetname}</td>
+                        <td>{selectedAccount.name}</td>
                       </tr>
                     ))
                 ) : (

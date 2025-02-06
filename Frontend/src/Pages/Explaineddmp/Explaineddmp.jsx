@@ -281,125 +281,7 @@ const Explaineddmp = () => {
 
   const { datePreset, format } = filters;
 
-  // const filterByDate = (details, preset) => {
-  //   const currentDate = new Date();
-  //   let filteredData = [];
-
-  //   if (!Array.isArray(details) || details.length === 0) {
-  //     console.warn("No details available to filter");
-  //     return [];
-  //   }
-
-  //   switch (preset) {
-  //     case "last-7-days": {
-  //       const last7Days = new Date();
-  //       last7Days.setDate(last7Days.getDate() - 7);
-  //       last7Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
-      
-  //       filteredData = details.filter((detail) => {
-  //         const callStartDate = detail.call_start_time
-  //           ? new Date(detail.call_start_time)
-  //           : null;
-  //         if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
-  //         return callStartDate && callStartDate >= last7Days; // Filter based on call_start_time
-  //       });
-  //       break;
-  //     }
-      
-  //     case "last-14-days": {
-  //       const last14Days = new Date();
-  //       last14Days.setDate(last14Days.getDate() - 14);
-  //       last14Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
-      
-  //       filteredData = details.filter((detail) => {
-  //         const callStartDate = detail.call_start_time
-  //           ? new Date(detail.call_start_time)
-  //           : null;
-  //         if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
-  //         return callStartDate && callStartDate >= last14Days; // Filter based on call_start_time
-  //       });
-  //       break;
-  //     }
-      
-  //     case "last-30-days": {
-  //       const last30Days = new Date();
-  //       last30Days.setDate(last30Days.getDate() - 30);
-  //       last30Days.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
-      
-  //       filteredData = details.filter((detail) => {
-  //         const callStartDate = detail.call_start_time
-  //           ? new Date(detail.call_start_time)
-  //           : null;
-  //         if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
-  //         return callStartDate && callStartDate >= last30Days; // Filter based on call_start_time
-  //       });
-  //       break;
-  //     }
-      
-
-  //     case "yesterday": {
-  //       const yesterday = new Date();
-  //       yesterday.setDate(yesterday.getDate() - 1);
-  //       yesterday.setHours(0, 0, 0, 0);
-      
-  //       filteredData = details.filter((detail) => {
-  //         const callStartDate = detail.call_start_time
-  //           ? new Date(detail.call_start_time)
-  //           : null;
-  //         if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Set the time part to 00:00:00 for comparison
-  //         return callStartDate && callStartDate >= yesterday;
-  //       });
-  //       break;
-  //     }
-      
-
-  //     case "last-day": {
-  //       const lastDay = new Date();
-  //       lastDay.setDate(lastDay.getDate() - 1);
-  //       lastDay.setHours(0, 0, 0, 0); // Set to midnight to compare only the date
-      
-  //       filteredData = details.filter((detail) => {
-  //         const callStartDate = detail.call_start_time
-  //           ? new Date(detail.call_start_time)
-  //           : null;
-  //         if (callStartDate) callStartDate.setHours(0, 0, 0, 0); // Reset the time part to compare dates only
-  //         return callStartDate && callStartDate >= lastDay; // Filter based on call_start_time
-  //       });
-  //       break;
-  //     }
-      
-
-  //     //
-
-  //     case "custom-range": {
-  //       if (startDate && endDate) {
-  //         const customStartDate = new Date(startDate);
-  //         const customEndDate = new Date(endDate);
-  //         customStartDate.setHours(0, 0, 0, 0); // Set start date to midnight
-  //         customEndDate.setHours(23, 59, 59, 999); // Set end date to just before midnight of the next day
-      
-  //         filteredData = details.filter((detail) => {
-  //           const callStartDate = detail.call_start_time
-  //             ? new Date(detail.call_start_time)
-  //             : null;
-  //           return (
-  //             callStartDate &&
-  //             callStartDate >= customStartDate &&
-  //             callStartDate <= customEndDate
-  //           );
-  //         });
-  //       }
-  //       break;
-  //     }
-      
-  //     default:
-  //       filteredData = details;
-  //       break;
-  //   }
-
-  //   return filteredData;
-  // };
-
+  
   const filterByDate = (details, preset, startDate = null, endDate = null) => {
     if (!Array.isArray(details) || details.length === 0) {
         console.warn("No details available to filter");
@@ -632,6 +514,7 @@ const Explaineddmp = () => {
                   <th>Call Type</th>
                   <th>Source</th>
                   <th>Created On</th>
+                  <th>Lead Date</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -708,6 +591,7 @@ const Explaineddmp = () => {
                       <td>{row.call_type || "N/A"}</td>
                       <td>{row.source || "N/A"}</td>
                       <td>{row.Created_On || "N/A"}</td>
+                      <td>{row.lead_date || "N/A"}</td>
                     </tr>
                   ))
                 ) : (
