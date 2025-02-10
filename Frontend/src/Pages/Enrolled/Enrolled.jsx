@@ -266,123 +266,112 @@ const Enrolled = () => {
 
   const { datePreset, format } = filters;
 
-  const filterByDate = (details, preset) => {
+  const filterByDate = (details, preset, startDate = null, endDate = null) => {
     const currentDate = new Date();
     let filteredData = [];
-
+  
     if (!Array.isArray(details) || details.length === 0) {
       console.warn("No details available to filter");
       return [];
     }
-
+  
     switch (preset) {
       case "last-7-days": {
         const last7Days = new Date();
         last7Days.setDate(currentDate.getDate() - 7);
         last7Days.setHours(0, 0, 0, 0);
-
+  
         filteredData = details.filter((detail) => {
-          const createdDate = detail.date
-            ? new Date(detail.date)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
+          const createdDate = detail.date ? new Date(detail.date) : null;
           return createdDate && createdDate >= last7Days;
         });
         break;
       }
-
+  
       case "last-14-days": {
         const last14Days = new Date();
         last14Days.setDate(currentDate.getDate() - 14);
         last14Days.setHours(0, 0, 0, 0);
-
+  
         filteredData = details.filter((detail) => {
-          const createdDate = detail.date
-            ? new Date(detail.date)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
+          const createdDate = detail.date ? new Date(detail.date) : null;
           return createdDate && createdDate >= last14Days;
         });
         break;
       }
-
-      //
-
+  
       case "last-30-days": {
         const last30Days = new Date();
         last30Days.setDate(currentDate.getDate() - 30);
         last30Days.setHours(0, 0, 0, 0);
-
+  
         filteredData = details.filter((detail) => {
-          const createdDate = detail.date
-            ? new Date(detail.date)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
+          const createdDate = detail.date ? new Date(detail.date) : null;
           return createdDate && createdDate >= last30Days;
         });
         break;
       }
-
+  
       case "yesterday": {
         const yesterday = new Date();
         yesterday.setDate(currentDate.getDate() - 1);
         yesterday.setHours(0, 0, 0, 0);
-
+  
+        const endOfYesterday = new Date(yesterday);
+        endOfYesterday.setHours(23, 59, 59, 999);
+  
         filteredData = details.filter((detail) => {
-          const createdDate = detail.date
-            ? new Date(detail.date)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= yesterday;
+          const createdDate = detail.date ? new Date(detail.date) : null;
+          return createdDate && createdDate >= yesterday && createdDate <= endOfYesterday;
         });
         break;
       }
-
+  
       case "last-day": {
-        const lastDay = new Date();
-        lastDay.setDate(currentDate.getDate() - 1);
-        lastDay.setHours(0, 0, 0, 0);
-
+        const yesterday = new Date();
+        yesterday.setDate(currentDate.getDate() - 1);
+        yesterday.setHours(0, 0, 0, 0);
+  
+        const endOfYesterday = new Date(yesterday);
+        endOfYesterday.setHours(23, 59, 59, 999);
+  
         filteredData = details.filter((detail) => {
-          const createdDate = detail.date
-            ? new Date(detail.date)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= lastDay;
+          const createdDate = detail.date ? new Date(detail.date) : null;
+          return createdDate && createdDate >= yesterday && createdDate <= endOfYesterday;
         });
         break;
       }
-
-      //
-
+  
       case "custom-range": {
         if (startDate && endDate) {
-          const customStartDate = new Date(startDate);
-          const customEndDate = new Date(endDate);
-          customStartDate.setHours(0, 0, 0, 0);
-          customEndDate.setHours(23, 59, 59, 999);
-
-          filteredData = details.filter((detail) => {
-            const createdDate = detail.date
-              ? new Date(detail.date)
-              : null;
-            return (
-              createdDate &&
-              createdDate >= customStartDate &&
-              createdDate <= customEndDate
-            );
-          });
+            const customStartDate = new Date(startDate);
+            const customEndDate = new Date(endDate);
+            customStartDate.setHours(0, 0, 0, 0);
+            customEndDate.setHours(23, 59, 59, 999);
+    
+            console.log("Filtering from:", customStartDate, "to", customEndDate);
+    
+            filteredData = details.filter((detail) => {
+                const createdDate = detail.date ? new Date(detail.date) : null;
+                console.log("Checking:", createdDate);
+                
+                return createdDate && createdDate >= customStartDate && createdDate <= customEndDate;
+            });
+    
+            console.log("Filtered Data:", filteredData);
         }
         break;
-      }
-
+    }
+    
+  
       default:
         filteredData = details;
         break;
     }
-
+  
     return filteredData;
   };
+  
 
   const getFilteredData = () => {
     let dataToFilter = [];
@@ -502,7 +491,7 @@ const Enrolled = () => {
                 <tr className="bg-gray-800 text-white text-left">
                   <th>#</th>
                   <th>Lead Date</th>
-                  <th>Date</th>
+                  <th>Payment Date</th>
                   <th>Source</th>
                   <th>Agent</th>
                   <th>Client</th>

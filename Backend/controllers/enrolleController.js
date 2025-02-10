@@ -125,14 +125,77 @@ const createEnrolleeData = async (req, res) => {
   };
   
 
+// const getEnrolleeData = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const pageSize = parseInt(req.query.pageSize) || 10;
+//     const search = req.query.search || "";
+//     const startDate = req.query.startDate ? req.query.startDate : null;
+//     const endDate = req.query.endDate ? req.query.endDate : null;
+//     const sortBy = req.query.sortBy || "date";
+//     const sortDirection = req.query.sortDirection || "desc";
+//     const sortOrder = sortDirection === "asc" ? 1 : -1;
+
+//     if (page <= 0 || pageSize <= 0) {
+//       return res.status(400).json({ error: "Invalid pagination parameters" });
+//     }
+
+//     const skip = (page - 1) * pageSize;
+
+//     // Build search filter
+//     const searchFilter = search
+//       ? {
+//           $or: [
+//             { client: { $regex: search, $options: "i" } },
+//             { email: { $regex: search, $options: "i" } },
+//             { contactNo: { $regex: search, $options: "i" } },
+//             { city: { $regex: search, $options: "i" } },
+//             { agent: { $regex: search, $options: "i" } },
+//             { source: { $regex: search, $options: "i" } },
+//             { date: { $regex: search, $options: "i" } },
+//           ],
+//         }
+//       : {};
+
+//     // Add startDate and endDate to filter if provided
+//     if (startDate && endDate) {
+//       searchFilter.leadDate = {
+//         $gte: startDate,
+//         $lte: endDate,
+//       };
+//     }
+
+//     console.log("Search Filter:", searchFilter);
+
+//     // Fetch enrollees with pagination, sorting, and date filtering
+//     const enrollees = await Enrollee.find(searchFilter)
+//       .sort({ [sortBy]: sortOrder, _id: -1 })
+//       .skip(skip)
+//       .limit(pageSize);
+
+//     const totalEnrollees = await Enrollee.countDocuments(searchFilter);
+//     const totalPages = Math.ceil(totalEnrollees / pageSize);
+
+//     res.status(200).json({
+//       enrollees,
+//       currentPage: page,
+//       totalPages,
+//       totalEnrollees,
+//     });
+//   } catch (error) {
+//     console.error("Error occurred while fetching enrollees:", error);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
 const getEnrolleeData = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const search = req.query.search || "";
-    const startDate = req.query.startDate ? req.query.startDate : null;
-    const endDate = req.query.endDate ? req.query.endDate : null;
-    const sortBy = req.query.sortBy || "leadDate";
+    const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+    const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+    const sortBy = req.query.sortBy || "date";
     const sortDirection = req.query.sortDirection || "desc";
     const sortOrder = sortDirection === "asc" ? 1 : -1;
 
@@ -156,9 +219,13 @@ const getEnrolleeData = async (req, res) => {
         }
       : {};
 
-    // Add startDate and endDate to filter if provided
+    // Add date range filtering
     if (startDate && endDate) {
-      searchFilter.leadDate = {
+      // Set time boundaries for accurate filtering
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+
+      searchFilter.date = {
         $gte: startDate,
         $lte: endDate,
       };
@@ -186,6 +253,7 @@ const getEnrolleeData = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 module.exports = {
   createEnrolleeData,
