@@ -23,6 +23,8 @@ const dmpSchema = new mongoose.Schema({
     default: "NA",
   },
   lead_date: Date,
-});
+},
+{ timestamps: true } // Adds createdAt and updatedAt fields automatically
+);
 
 module.exports = mongoose.model("Dmp", dmpSchema);

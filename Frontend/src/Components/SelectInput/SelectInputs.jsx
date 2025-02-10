@@ -23,40 +23,10 @@ const SelectInputs = ({
     [setSearch, setCurrentPage]
   );
 
-  // useEffect(() => {
-  //   if (name !== "lead") return;
-
-  //   if (search === "") {
-  //     setCurrentPage(0);
-  //     return;
-  //   };
-  //   const fetchDataFromAPI = async () => {
-  //     try {
-  //       const response = await axios.get(`${MONGO_URI}/api/leads`, {
-  //         params: {
-  //           page: 1,
-  //           pageSize: rowsPerPage,
-  //           search: search,
-  //           sortOrder: "asc",
-  //           startDate: null,
-  //           endDate: null,
-  //         },
-  //       });
-
-  //       setMongoData(response.data);
-  //       setCampaignDetails(response.data.leads);
-  //       setCurrentPage(response.data.currentPage - 1);
-  //       setTotalPages(response.data.totalPages);
-  //     } catch (error) {
-  //       console.error("Error fetching data: ", error);
-  //     }
-  //   };
-
-  //   fetchDataFromAPI();
-  // }, [search, rowsPerPage, setCurrentPage, MONGO_URI, name, setMongoData]);
+  
 
   useEffect(() => {
-    if (name !== "lead" && name !== "dmp") return; // Ensure name is either 'lead' or 'dmp'
+    if (name !== "lead" && name !== "dmp" && name !== "enrolle") return; // Ensure name is either 'lead' or 'dmp'
 
     if (search === " ") {
       setCurrentPage(0);
@@ -71,6 +41,8 @@ const SelectInputs = ({
           apiEndpoint = `${MONGO_URI}/api/leads`;
         } else if (name === "dmp") {
           apiEndpoint = `${MONGO_URI}/api/dmp`;
+        }else if (name === "enrolle") {
+          apiEndpoint = `${MONGO_URI}/api/enrolle`;
         }
 
         const response = await axios.get(apiEndpoint, {
@@ -90,6 +62,8 @@ const SelectInputs = ({
           setCampaignDetails(response.data.leads);
         } else if (name === "dmp") {
           setCampaignDetails(response.data.dmps);
+        }else if (name === "enrolle") {
+          setCampaignDetails(response.data.enrollees);
         }
 
         setCurrentPage(response.data.currentPage - 1);
@@ -119,7 +93,7 @@ const SelectInputs = ({
       {name === "campaign" ||
       name === "adset" ||
       name === "ads" ||
-      name === "lead" ? (
+      name === "lead"  ? (
         <Brands setSearch={setSearch} setCurrentPage={setCurrentPage} />
       ) : null}
 
@@ -132,6 +106,7 @@ const SelectInputs = ({
         "lead",
         "dmp",
         "Source",
+        "enrolle",
       ].includes(name) && (
         <input
           type="text"

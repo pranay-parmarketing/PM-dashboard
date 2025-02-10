@@ -590,7 +590,23 @@ const Explaineddmp = () => {
                       </td>
                       <td>{row.call_type || "N/A"}</td>
                       <td>{row.source || "N/A"}</td>
-                      <td>{row.Created_On || "N/A"}</td>
+                      <td>
+                      {row.Created_On
+                          ? new Date(row.Created_On).toLocaleString(
+                              "en-GB",
+                              {
+                                timeZone: "UTC", // Force UTC time
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: true, // Display in 12-hour format
+                              }
+                            )
+                          : "N/A"}
+                      </td>
                       <td>{row.lead_date || "N/A"}</td>
                     </tr>
                   ))
