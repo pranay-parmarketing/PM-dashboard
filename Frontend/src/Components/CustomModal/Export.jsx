@@ -142,7 +142,8 @@ const Export = ({
     let filteredData = data;
 
     // Determine the date field based on the 'name' prop
-    const dateField = name === "lead" ? "createdOn" : name === "dmp" ? "call_start_time" : null;
+    const dateField = name === "lead" ? "createdOn" : name === "dmp" ? "call_start_time" : name === "enrolle" ? "date" : null;
+
 
     // Apply date filter if provided
     if (filters?.startDate && filters?.endDate && dateField) {
