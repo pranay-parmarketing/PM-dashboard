@@ -502,12 +502,12 @@ const Enrolled = () => {
                   <th>#</th>
                   <th>Lead Date</th>
                   <th>Payment Date</th>
-                  <th>Source</th>
                   <th>Client</th>
                   <th>Email</th>
                   <th>Contact No</th>
-                  <th>Agent</th>
                   <th>City</th>
+                  <th>Agent</th>
+                  <th>Source</th>
                   <th>Status</th>
                   <th>Payment Mode</th>
                   <th>Payment Made</th>
@@ -552,12 +552,12 @@ const Enrolled = () => {
                             })
                           : "N/A"}
                       </td>
-                      <td data-label="Phone"> {row.source || "N/A"} </td>
                       <td data-label="client"> {row.client || "N/A"} </td>
                       <td data-label="email"> {row.email || "N/A"} </td>
                       <td data-label="contactNo"> {row.contactNo || "N/A"} </td>
-                      <td data-label="agent"> {row.agent || "N/A"} </td> 
                       <td data-label="city"> {row.city || "N/A"} </td>
+                      <td data-label="agent"> {row.agent || "N/A"} </td> 
+                      <td data-label="Phone"> {row.source || "N/A"} </td>
                       <td data-label="status"> {row.status || "N/A"} </td>
                       <td data-label="paymentMode">{row.paymentMode || "N/A"}</td> 
                       <td data-label="paymentMade">{row.paymentMade || "N/A"}</td>
