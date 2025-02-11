@@ -402,7 +402,7 @@ const Enrolled = () => {
       datePreset,
       startDate,
       endDate
-    );
+    ); 
 
     return finalFilteredData;
   };
