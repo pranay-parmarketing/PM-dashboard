@@ -99,6 +99,8 @@ const createEnrolleeData = async (req, res) => {
                 city: enrollee.city || "",
                 email: enrollee.email || "", 
                 paymentMode: enrollee.paymentMode || "",
+                paymentMade: enrollee.paymentMade || "",
+                paymentNumber: enrollee.paymentNumber|| "",
                 contactNo: contactNo,
                 disposableIncome: enrollee.disposableIncome || 0,
                 gst: enrollee.gst || 0,

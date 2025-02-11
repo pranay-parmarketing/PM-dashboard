@@ -269,109 +269,119 @@ const Enrolled = () => {
   const filterByDate = (details, preset, startDate = null, endDate = null) => {
     const currentDate = new Date();
     let filteredData = [];
-  
+
     if (!Array.isArray(details) || details.length === 0) {
       console.warn("No details available to filter");
       return [];
     }
-  
+
     switch (preset) {
       case "last-7-days": {
         const last7Days = new Date();
         last7Days.setDate(currentDate.getDate() - 7);
         last7Days.setHours(0, 0, 0, 0);
-  
+
         filteredData = details.filter((detail) => {
           const createdDate = detail.date ? new Date(detail.date) : null;
           return createdDate && createdDate >= last7Days;
         });
         break;
       }
-  
+
       case "last-14-days": {
         const last14Days = new Date();
         last14Days.setDate(currentDate.getDate() - 14);
         last14Days.setHours(0, 0, 0, 0);
-  
+
         filteredData = details.filter((detail) => {
           const createdDate = detail.date ? new Date(detail.date) : null;
           return createdDate && createdDate >= last14Days;
         });
         break;
       }
-  
+
       case "last-30-days": {
         const last30Days = new Date();
         last30Days.setDate(currentDate.getDate() - 30);
         last30Days.setHours(0, 0, 0, 0);
-  
+
         filteredData = details.filter((detail) => {
           const createdDate = detail.date ? new Date(detail.date) : null;
           return createdDate && createdDate >= last30Days;
         });
         break;
       }
-  
+
       case "yesterday": {
         const yesterday = new Date();
         yesterday.setDate(currentDate.getDate() - 1);
         yesterday.setHours(0, 0, 0, 0);
-  
+
         const endOfYesterday = new Date(yesterday);
         endOfYesterday.setHours(23, 59, 59, 999);
-  
+
         filteredData = details.filter((detail) => {
           const createdDate = detail.date ? new Date(detail.date) : null;
-          return createdDate && createdDate >= yesterday && createdDate <= endOfYesterday;
+          return (
+            createdDate &&
+            createdDate >= yesterday &&
+            createdDate <= endOfYesterday
+          );
         });
         break;
       }
-  
+
       case "last-day": {
         const yesterday = new Date();
         yesterday.setDate(currentDate.getDate() - 1);
         yesterday.setHours(0, 0, 0, 0);
-  
+
         const endOfYesterday = new Date(yesterday);
         endOfYesterday.setHours(23, 59, 59, 999);
-  
+
         filteredData = details.filter((detail) => {
           const createdDate = detail.date ? new Date(detail.date) : null;
-          return createdDate && createdDate >= yesterday && createdDate <= endOfYesterday;
+          return (
+            createdDate &&
+            createdDate >= yesterday &&
+            createdDate <= endOfYesterday
+          );
         });
         break;
       }
-  
+
       case "custom-range": {
         if (startDate && endDate) {
-            const customStartDate = new Date(startDate);
-            const customEndDate = new Date(endDate);
-            customStartDate.setHours(0, 0, 0, 0);
-            customEndDate.setHours(23, 59, 59, 999);
-    
-            console.log("Filtering from:", customStartDate, "to", customEndDate);
-    
-            filteredData = details.filter((detail) => {
-                const createdDate = detail.date ? new Date(detail.date) : null;
-                console.log("Checking:", createdDate);
-                
-                return createdDate && createdDate >= customStartDate && createdDate <= customEndDate;
-            });
-    
-            console.log("Filtered Data:", filteredData);
+          const customStartDate = new Date(startDate);
+          const customEndDate = new Date(endDate);
+          customStartDate.setHours(0, 0, 0, 0);
+          customEndDate.setHours(23, 59, 59, 999);
+
+          console.log("Filtering from:", customStartDate, "to", customEndDate);
+
+          filteredData = details.filter((detail) => {
+            const createdDate = detail.date ? new Date(detail.date) : null;
+            console.log("Checking:", createdDate);
+
+            return (
+              createdDate &&
+              createdDate >= customStartDate &&
+              createdDate <= customEndDate
+            );
+          });
+
+          console.log("Filtered Data:", filteredData);
         }
         break;
-    }
-    
-  
+      }
+
       default:
         filteredData = details;
         break;
     }
-  
+
     return filteredData;
   };
-  
 
   const getFilteredData = () => {
     let dataToFilter = [];
@@ -439,7 +449,7 @@ const Enrolled = () => {
       <div className="homeContainer">
         <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
           <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
-          Enrolled
+            Enrolled
           </h1>
           <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
             <button
@@ -493,16 +503,18 @@ const Enrolled = () => {
                   <th>Lead Date</th>
                   <th>Payment Date</th>
                   <th>Source</th>
-                  <th>Agent</th>
                   <th>Client</th>
-                  <th>City</th>
                   <th>Email</th>
-                  <th>Payment Mode</th>
                   <th>Contact No</th>
+                  <th>Agent</th>
+                  <th>City</th>
+                  <th>Status</th>
+                  <th>Payment Mode</th>
+                  <th>Payment Made</th>
                   <th>Disposible Income</th>
+                  <th>payment Number</th>
                   <th>GST</th>
                   <th>NET</th>
-                  <th>Status</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -541,22 +553,19 @@ const Enrolled = () => {
                           : "N/A"}
                       </td>
                       <td data-label="Phone"> {row.source || "N/A"} </td>
-                      <td data-label="agent"> {row.agent || "N/A"} </td>
                       <td data-label="client"> {row.client || "N/A"} </td>
-                      <td data-label="city"> {row.city || "N/A"} </td>
                       <td data-label="email"> {row.email || "N/A"} </td>
-                      <td data-label="paymentMode">
-                        {" "}
-                        {row.paymentMode || "N/A"}{" "}
-                      </td>
                       <td data-label="contactNo"> {row.contactNo || "N/A"} </td>
-                      <td data-label="disposableIncome">
-                        {" "}
-                        {row.disposableIncome || "N/A"}{" "}
-                      </td>
+                      <td data-label="agent"> {row.agent || "N/A"} </td> 
+                      <td data-label="city"> {row.city || "N/A"} </td>
+                      <td data-label="status"> {row.status || "N/A"} </td>
+                      <td data-label="paymentMode">{row.paymentMode || "N/A"}</td> 
+                      <td data-label="paymentMade">{row.paymentMade || "N/A"}</td>
+                      <td data-label="disposableIncome">{row.disposableIncome || "N/A"}</td>
+                      <td data-label="paymentNumber">{row.paymentNumber || "N/A"}</td>
                       <td data-label="gst"> {row.gst || "N/A"} </td>
                       <td data-label="net"> {row.net || "N/A"} </td>
-                      <td data-label="status"> {row.status || "N/A"} </td>
+                     
                     </tr>
                   ))
                 ) : (
@@ -584,7 +593,7 @@ const Enrolled = () => {
         </div>
       </div>
     </div>
-  );
+  ); 
 };
 
 export default Enrolled;

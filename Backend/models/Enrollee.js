@@ -9,6 +9,8 @@ const enrolleeSchema = new mongoose.Schema({
   city: { type: String },
   email: { type: String },
   paymentMode: { type: String },
+  paymentMade: { type: String },
+  paymentNumber: { type: String },
   contactNo: { type: String, unique: true },
   disposableIncome: { type: Number },
   gst: { type: Number },
