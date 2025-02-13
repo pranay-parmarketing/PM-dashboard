@@ -19,6 +19,9 @@ const dmpRoute = require('./routes/dmpRoute.js');
 const sentleadRoute = require('./routes/sentlead.js'); 
 const sourceRoute = require('./routes/sourceRoute.js'); 
 const enrolleRoute = require('./routes/enrolleRoute.js'); 
+const packsentRoute = require('./routes/packsentRoute.js'); 
+
+const cron = require("node-cron");
 
 
 const app = express();
@@ -57,9 +60,11 @@ app.use('/api/enrolle',enrolleRoute)
 app.use('/api/source',sourceRoute)
 app.use('/api/dmp',dmpRoute)
 app.use('/api/sent-leads',sentleadRoute)
+app.use('/api/packsent',packsentRoute)
 
 const fetch = require('node-fetch');
 const NodeCache = require('node-cache');
+const { scheduledPacksentFetch } = require('./controllers/packsentController.js');
 
 const cache = new NodeCache({ stdTTL: 86400 }); 
 
@@ -112,7 +117,15 @@ app.get('/custom-proxy', async (req, res) => {
   }
 });
 
+// 
 
+// Run cron job at 12 AM
+cron.schedule("0 0 * * *", async () => {
+  await scheduledPacksentFetch();
+}, {
+  scheduled: true,
+  timezone: "Asia/Kolkata",
+});
 
 
 // 

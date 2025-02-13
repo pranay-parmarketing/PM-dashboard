@@ -512,7 +512,7 @@ const Enrolled = () => {
                   <th>Payment Mode</th>
                   <th>Payment Made</th>
                   <th>Disposible Income</th>
-                  <th>payment Number</th>
+                  <th>Payment Number</th>
                   <th>GST</th>
                   <th>NET</th>
                 </tr>

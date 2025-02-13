@@ -26,7 +26,7 @@ const SelectInputs = ({
   
 
   useEffect(() => {
-    if (name !== "lead" && name !== "dmp" && name !== "enrolle") return; // Ensure name is either 'lead' or 'dmp'
+    if (name !== "lead" && name !== "dmp" && name !== "enrolle" && name !== "packsent" ) return; // Ensure name is either 'lead' or 'dmp'
 
     if (search === " ") {
       setCurrentPage(0);
@@ -43,6 +43,8 @@ const SelectInputs = ({
           apiEndpoint = `${MONGO_URI}/api/dmp`;
         }else if (name === "enrolle") {
           apiEndpoint = `${MONGO_URI}/api/enrolle`;
+        }else if (name === "packsent") {
+          apiEndpoint = `${MONGO_URI}/api/packsent`;
         }
 
         const response = await axios.get(apiEndpoint, {
@@ -64,6 +66,8 @@ const SelectInputs = ({
           setCampaignDetails(response.data.dmps);
         }else if (name === "enrolle") {
           setCampaignDetails(response.data.enrollees);
+        }else if (name === "packsent") {
+          setCampaignDetails(response.data.packsent);
         }
 
         setCurrentPage(response.data.currentPage - 1);
@@ -107,6 +111,7 @@ const SelectInputs = ({
         "dmp",
         "Source",
         "enrolle",
+        "packsent",
       ].includes(name) && (
         <input
           type="text"
