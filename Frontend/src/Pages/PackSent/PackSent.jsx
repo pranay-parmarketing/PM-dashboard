@@ -19,6 +19,9 @@ const PackSent = () => {
   const [filters, setFilters] = useState({ datePreset: "", format: "" });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   useEffect(() => {
     fetchData();
   }, [currentPage, rowsPerPage, search, filters]);
@@ -26,27 +29,30 @@ const PackSent = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${MONGO_URI}/api/packsent`, {
-        params: {
-          page: Math.max(1, currentPage + 1), // Convert 0-based to 1-based for API
-          limit: rowsPerPage,
-          search: search,
-          sort: "sentDate",
-          order: "desc",
-          datePreset: filters.datePreset,
-        },
-      });
+        const res = await axios.get(`${MONGO_URI}/api/packsent`, {
+            params: {
+                page: Math.max(1, currentPage + 1),
+                limit: rowsPerPage,
+                search,
+                sort: "sentDate",
+                order: "desc",
+                datePreset: filters.datePreset,
+                startDate,
+                endDate,
+            },
+        });
 
-      setData(res.data.data || []);
-      setTotalPages(res.data.totalPages || 1);
+        setData(res.data.data || []);
+        setTotalPages(res.data.totalPages || 1);
     } catch (error) {
-      console.error("Failed to fetch data:", error);
-      setData([]);
-      setTotalPages(1);
+        console.error("Failed to fetch data:", error);
+        setData([]);
+        setTotalPages(1);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   const handleNextPage = () => {
     if (currentPage + 1 < totalPages) {
@@ -73,13 +79,16 @@ const PackSent = () => {
     setCurrentPage(0);
   };
 
-
   return (
     <div className="home">
       <FilterModal
         isOpen={isModalOpen}
         onClose={closeModal}
         onApplyFilters={handleApplyFilters}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
+        endDate={endDate}
+        startDate={startDate}
       />
 
       <div className="homeContainer">
@@ -96,7 +105,6 @@ const PackSent = () => {
               <IoMdAdd className="mr-2" />
               <span className="btn-text">New Filter</span>
             </button>
-          
           </div>
         </div>
 

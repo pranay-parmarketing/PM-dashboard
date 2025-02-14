@@ -86,46 +86,117 @@ cron.schedule("0 0 * * *", async () => {
   await createPacksent();
 });
 
-const getPacksent = async (req, res) => {
-    try {
-      let { page = 1, limit = 10, sort = "sentDate", order = "desc", search = "" } = req.query;
+// const getPacksent = async (req, res) => {
+//     try {
+//       let { page = 1, limit = 10, sort = "sentDate", order = "desc", search = "" } = req.query;
   
+//       page = parseInt(page);
+//       limit = parseInt(limit);
+//       order = order === "asc" ? 1 : -1;
+  
+//       const query = {};
+  
+     
+//       if (search) {
+//         query.$or = [
+//           { name: { $regex: search, $options: "i" } },
+//           { email: { $regex: search, $options: "i" } },
+//           { phone: { $regex: search, $options: "i" } },
+//         ];
+//       }
+  
+     
+//       const totalDocs = await Packsent.countDocuments(query);
+  
+      
+//       const documents = await Packsent.find(query)
+//         .sort({ [sort]: order }) 
+//         .skip((page - 1) * limit)
+//         .limit(limit);
+  
+//       res.json({
+//         totalDocs,
+//         totalPages: Math.ceil(totalDocs / limit),
+//         currentPage: page,
+//         pageSize: limit,
+//         data: documents,
+//       });
+//     } catch (error) {
+//       console.error("❌ Error fetching Packsent data:", error.message);
+//       res.status(500).json({ error: "Failed to fetch data" });
+//     }
+//   };
+  
+//   module.exports = { createPacksent, getPacksent };
+  
+const getPacksent = async (req, res) => {
+  try {
+      let { page = 1, limit = 10, sort = "sentDate", order = "desc", search = "", datePreset, startDate, endDate } = req.query;
+
+      if (datePreset === "custom-range" && (!startDate || !endDate)) {
+        return res.status(400).json({ message: "startDate and endDate are required for custom-range" });
+    }
+    console.log('startDate',startDate,'endDate',endDate)
+
       page = parseInt(page);
       limit = parseInt(limit);
       order = order === "asc" ? 1 : -1;
-  
+
       const query = {};
-  
-     
+
+      // Search filter
       if (search) {
-        query.$or = [
-          { name: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-          { phone: { $regex: search, $options: "i" } },
-        ];
+          query.$or = [
+              { name: { $regex: search, $options: "i" } },
+              { email: { $regex: search, $options: "i" } },
+              { phone: { $regex: search, $options: "i" } },
+          ];
       }
-  
-     
+
+      // Date filtering based on presets
+      if (datePreset) {
+          const today = new Date();
+          switch (datePreset) {
+              case "today":
+                  query.sentDate = { $gte: new Date(today.setHours(0, 0, 0, 0)), $lt: new Date(today.setHours(23, 59, 59, 999)) };
+                  break;
+              case "last7days":
+                  query.sentDate = { $gte: new Date(today.setDate(today.getDate() - 7)) };
+                  break;
+              case "last30days":
+                  query.sentDate = { $gte: new Date(today.setDate(today.getDate() - 30)) };
+                  break;
+              default:
+                  break;
+          }
+      }
+
+      // Custom date range filtering
+      if (startDate && endDate) {
+          query.sentDate = {
+              $gte: new Date(startDate),
+              $lte: new Date(endDate),
+          };
+      }
+
       const totalDocs = await Packsent.countDocuments(query);
-  
-      
       const documents = await Packsent.find(query)
-        .sort({ [sort]: order }) 
-        .skip((page - 1) * limit)
-        .limit(limit);
-  
+          .sort({ [sort]: order })
+          .skip((page - 1) * limit)
+          .limit(limit);
+
       res.json({
-        totalDocs,
-        totalPages: Math.ceil(totalDocs / limit),
-        currentPage: page,
-        pageSize: limit,
-        data: documents,
+          totalDocs,
+          totalPages: Math.ceil(totalDocs / limit),
+          currentPage: page,
+          pageSize: limit,
+          data: documents,
       });
-    } catch (error) {
+  } catch (error) {
       console.error("❌ Error fetching Packsent data:", error.message);
       res.status(500).json({ error: "Failed to fetch data" });
-    }
-  };
-  
-  module.exports = { createPacksent, getPacksent };
-  
+  }
+};
+
+
+module.exports = { createPacksent, getPacksent };
