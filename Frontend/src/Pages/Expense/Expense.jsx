@@ -29,6 +29,9 @@ const Expense = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   //
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");  
+
   const [mongoData, setMongoData] = useState({});
 
   const accessToken = access_token;
@@ -324,7 +327,7 @@ const Expense = () => {
     const fetchCampaigns = async () => {
       try {
         const campaignData = [];
-        for (let id of allIds) {
+        for (let id of allIds) { 
           const response = await axios.get(
             `${MONGO_URI}/api/save-expense/${id}`
           );
@@ -358,6 +361,7 @@ const Expense = () => {
         onFileChange={handleFileChange}
         onFileSave={handleFileSave}
         errorMessage={error}
+        setStartDate={setStartDate}
       />
 
       <FilterModal
@@ -365,6 +369,10 @@ const Expense = () => {
         onClose={closeModal}
         Base={false}
         onApplyFilters={handleApplyFilters}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
       />
 
       <DetailsModal

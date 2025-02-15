@@ -5,6 +5,8 @@ import axios from "axios";
 import { MONGO_URI } from "../../Variables/Variables";
 import SelectInputs from "../../Components/SelectInput/SelectInputs";
 import Pagination from "../../Components/Pagination/Pagination";
+import { MdFileUpload } from "react-icons/md";
+import { IoMdAdd } from "react-icons/io";
 
 const Source = () => {
   const [search, setSearch] = useState("");
@@ -31,7 +33,7 @@ const Source = () => {
   // Fetch the source data with caching and expiration logic
   useEffect(() => {
     if (!selectedAccount?.id) return;
-  
+
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -40,11 +42,15 @@ const Source = () => {
         const timestampKey = `allSourceDataTimestamp_${selectedAccount.id}`;
         const cachedData = localStorage.getItem(cacheKey);
         const cachedTimestamp = localStorage.getItem(timestampKey);
-  
+
         const now = Date.now();
         const sixHoursInMs = 6 * 60 * 60 * 1000;
-  
-        if (cachedData && cachedTimestamp && now - cachedTimestamp < sixHoursInMs) {
+
+        if (
+          cachedData &&
+          cachedTimestamp &&
+          now - cachedTimestamp < sixHoursInMs
+        ) {
           // Use cached data if valid
           const sourceData = JSON.parse(cachedData);
           setAllSourceData(sourceData);
@@ -52,13 +58,13 @@ const Source = () => {
         } else {
           // Fetch fresh data for the selected account
           const sourceRes = await axios.get(`${MONGO_URI}/api/source`, {
-            params: { accountId: selectedAccount.id },  // Fetch only selected account data
+            params: { accountId: selectedAccount.id }, // Fetch only selected account data
           });
-  
+
           const sourceData = sourceRes.data.leads || [];
           setAllSourceData(sourceData);
           setFilteredData(sourceData);
-  
+
           // Cache the new data
           localStorage.setItem(cacheKey, JSON.stringify(sourceData));
           localStorage.setItem(timestampKey, now);
@@ -69,11 +75,9 @@ const Source = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
-  }, [selectedAccount]);  // Trigger effect only when selectedAccount changes
-  
-  
+  }, [selectedAccount]); // Trigger effect only when selectedAccount changes
 
   // Filter the data based on search query, ensuring allSourceData is not undefined
   useEffect(() => {
@@ -114,6 +118,19 @@ const Source = () => {
           <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
             Source
           </h1>
+          <div
+            className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center"
+            style={{ visibility: "hidden" }}
+          >
+            <button className="open-modal-btn flex items-center justify-center bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700 transition duration-200 w-full md:w-auto">
+              <MdFileUpload className="mr-2 my-3" />
+              <span className="btn-text">Import Adset</span>
+            </button>
+            <button className="filter-btn flex items-center justify-center bg-green-600 text-white rounded-md px-4 py-2 hover:bg-green-700 transition duration-200 w-full md:w-auto">
+              <IoMdAdd className="mr-2" />
+              <span className="btn-text">New Adset</span>
+            </button>
+          </div>
         </div>
 
         <div

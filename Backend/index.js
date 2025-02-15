@@ -20,6 +20,7 @@ const sentleadRoute = require('./routes/sentlead.js');
 const sourceRoute = require('./routes/sourceRoute.js'); 
 const enrolleRoute = require('./routes/enrolleRoute.js'); 
 const packsentRoute = require('./routes/packsentRoute.js'); 
+const analyticsRoutes = require('./routes/analyticsRoutes.js'); 
 
 const cron = require("node-cron");
 
@@ -61,6 +62,7 @@ app.use('/api/source',sourceRoute)
 app.use('/api/dmp',dmpRoute)
 app.use('/api/sent-leads',sentleadRoute)
 app.use('/api/packsent',packsentRoute)
+app.use('/api/visitorcount',analyticsRoutes)
 
 const fetch = require('node-fetch');
 const NodeCache = require('node-cache');

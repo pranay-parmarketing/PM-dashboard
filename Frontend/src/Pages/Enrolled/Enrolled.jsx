@@ -163,11 +163,11 @@ const Enrolled = () => {
 
     return data.filter((row) => {
       return (
-        (row.name && row.name.toLowerCase().includes(searchTerm)) ||
+        (row.client && row.client.toLowerCase().includes(searchTerm)) ||
         (row._id && row._id.toLowerCase().includes(searchTerm)) ||
         (row.brand && row.brand.toLowerCase().includes(searchTerm)) ||
         (row.city && row.city.toLowerCase().includes(searchTerm)) ||
-        (row.phone && row.phone.toLowerCase().includes(searchTerm)) ||
+        (row.contactNo && row.contactNo.toLowerCase().includes(searchTerm)) ||
         (row.email && row.email.toLowerCase().includes(searchTerm)) ||
         (row.source && row.source.toLowerCase().includes(searchTerm)) ||
         (row.brand && row.brand.toLowerCase().includes(searchTerm)) ||

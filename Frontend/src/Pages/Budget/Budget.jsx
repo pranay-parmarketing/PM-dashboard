@@ -406,6 +406,20 @@ const Budget = () => {
           <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
             Budget
           </h1>
+
+          <div
+            className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center"
+            style={{ visibility: "hidden" }}
+          >
+            <button className="open-modal-btn flex items-center justify-center bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700 transition duration-200 w-full md:w-auto">
+              <MdFileUpload className="mr-2 my-3" />
+              <span className="btn-text">Import Adset</span>
+            </button>
+            <button className="filter-btn flex items-center justify-center bg-green-600 text-white rounded-md px-4 py-2 hover:bg-green-700 transition duration-200 w-full md:w-auto">
+              <IoMdAdd className="mr-2" />
+              <span className="btn-text">New Adset</span>
+            </button>
+          </div>
           <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
             <button
               className="filter-btn flex items-center justify-center bg-green-600 text-white rounded-md px-4 py-2 hover:bg-green-700 transition duration-200 w-full md:w-auto"
