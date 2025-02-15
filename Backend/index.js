@@ -62,7 +62,7 @@ app.use('/api/source',sourceRoute)
 app.use('/api/dmp',dmpRoute)
 app.use('/api/sent-leads',sentleadRoute)
 app.use('/api/packsent',packsentRoute)
-app.use('/api/visitorcount',analyticsRoutes)
+// app.use('/api/visitorcount',analyticsRoutes)
 
 const fetch = require('node-fetch');
 const NodeCache = require('node-cache');
