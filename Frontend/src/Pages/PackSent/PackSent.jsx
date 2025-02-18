@@ -29,30 +29,29 @@ const PackSent = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-        const res = await axios.get(`${MONGO_URI}/api/packsent`, {
-            params: {
-                page: Math.max(1, currentPage + 1),
-                limit: rowsPerPage,
-                search,
-                sort: "sentDate",
-                order: "desc",
-                datePreset: filters.datePreset,
-                startDate,
-                endDate,
-            },
-        });
+      const res = await axios.get(`${MONGO_URI}/api/packsent`, {
+        params: {
+          page: Math.max(1, currentPage + 1),
+          limit: rowsPerPage,
+          search,
+          sort: "sentDate",
+          order: "desc",
+          datePreset: filters.datePreset,
+          startDate,
+          endDate,
+        },
+      });
 
-        setData(res.data.data || []);
-        setTotalPages(res.data.totalPages || 1);
+      setData(res.data.data || []);
+      setTotalPages(res.data.totalPages || 1);
     } catch (error) {
-        console.error("Failed to fetch data:", error);
-        setData([]);
-        setTotalPages(1);
+      console.error("Failed to fetch data:", error);
+      setData([]);
+      setTotalPages(1);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
+  };
 
   const handleNextPage = () => {
     if (currentPage + 1 < totalPages) {
