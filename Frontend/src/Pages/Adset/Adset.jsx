@@ -347,7 +347,7 @@ const Adset = () => {
             handlePreviousPage={handlePreviousPage}
             isPrevButtonDisabled={isPrevButtonDisabled}
             currentPage={currentPage}
-            campaignDetails={campaignDetails}
+            campaignDetails={mongoData}
             rowsPerPage={rowsPerPage}
             handleNextPage={handleNextPage}
             isNextButtonDisabled={isNextButtonDisabled}

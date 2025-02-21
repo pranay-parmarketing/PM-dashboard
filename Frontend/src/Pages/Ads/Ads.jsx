@@ -353,7 +353,7 @@ const Ads = () => {
             handlePreviousPage={handlePreviousPage}
             isPrevButtonDisabled={isPrevButtonDisabled}
             currentPage={currentPage}
-            campaignDetails={campaignDetails}
+            campaignDetails={mongoData[0]?.data}
             rowsPerPage={rowsPerPage}
             handleNextPage={handleNextPage}
             isNextButtonDisabled={isNextButtonDisabled}

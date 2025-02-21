@@ -1,494 +1,231 @@
-import React, { useContext, useEffect, useState } from "react";
-import { MdFileUpload } from "react-icons/md";
-import { IoMdAdd } from "react-icons/io";
-import ChooseFileModal from "../../Components/CustomModal/ChooseFileModal";
-
-import { ApiTokenContext } from "../../context/Apicontext";
+import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { ApiTokenContext } from "../../context/Apicontext";
 import { MONGO_URI } from "../../Variables/Variables";
-import EditModal from "../../Components/CustomModal/EditModal";
-import SelectInputs from "../../Components/SelectInput/SelectInputs";
-import Pagination from "../../Components/Pagination/Pagination";
-import FilterModal from "../../Components/CustomModal/FilterModal";
-import Export from "../../Components/CustomModal/Export";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Reports = () => {
-  const [mydata, setData] = useState([]);
-  const [search, setSearch] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [error, setError] = useState("");
-
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-
-  //
-  const [currentPage, setCurrentPage] = useState(0);
-
-  const [paginatedDetails, setPaginatedDetails] = useState([]);
-  const [campaignDetails, setCampaignDetails] = useState([]);
-  //
-  const [mongoData, setMongoData] = useState({});
-  const [loading, setLoading] = useState(false);
-  //
-  const [totalPages, setTotalPages] = useState(0);
-
-  const [totalreport, setTotalReport] = useState(0);
-
-  //
-  const [apitotalpage, setApitotalpage] = useState(0);
-
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+  const [insights, setInsights] = useState([]);
+  const [message, setMessage] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
+  const [isFetchingFromFacebook, setIsFetchingFromFacebook] = useState(false);
 
   const { appsecret_proof, access_token, selectedAccount } =
     useContext(ApiTokenContext);
 
-  const appSecretProof = appsecret_proof;
-  const accessToken = access_token;
+  // Function to get yesterday's date
+  const getYesterdayDate = () => {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    return date;
+  };
 
-  // Function to save campaign data to MongoDB
-  const saveCampaignData = async (campaignData) => {
+  // Set default dates on component mount
+  useEffect(() => {
+    const yesterday = getYesterdayDate();
+    setStartDate(yesterday);
+    setEndDate(yesterday);
+  }, []);
+
+  // Fetch and Store Facebook Insights
+  const fetchAndStoreInsights = async () => {
+    if (!selectedAccount?.id || !access_token) {
+      setMessage("Error: Account ID or Access Token is missing.");
+      return;
+    }
+
     try {
-      const campaignsWithAccountId = campaignData.map((campaign) => ({
-        ...campaign,
-        account_id: selectedAccount?.id || null,
-      }));
-
-      const saveResponse = await axios.post(``, campaignsWithAccountId, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      setIsFetchingFromFacebook(true);
+      const response = await axios.post(`${MONGO_URI}/api/facebook`, {
+        account_id: selectedAccount.id,
+        access_token,
+        appsecret_proof,
+        start_date: startDate?.toISOString().split("T")[0],
+        end_date: endDate?.toISOString().split("T")[0],
       });
-    } catch (saveError) {
-      console.error(
-        "Error saving campaign data:",
-        saveError.response ? saveError.response.data : saveError.message
+
+      setMessage(
+        response.data.message || "Facebook Insights fetched successfully"
       );
-    }
-  };
-
-  // Function to fetch all campaign data from the API
-  const fetchAllCampaignData = async (url) => {
-    setLoading(false);
-    let allData = [];
-    let currentPageUrl = url;
-
-    try {
-      while (currentPageUrl) {
-        const { data } = await axios.get(
-          ``
-          // `${currentPageUrl}&access_token=${accessToken}&appsecret_proof=${appSecretProof}`
-        );
-        setLoading(false);
-        if (data.data) {
-         
-          await saveCampaignData(data.data);
-
-          allData = [...allData, ...data.data];
-        }
-
-        currentPageUrl = data.paging?.next || null;
-      }
-
-      return allData;
+      setInsights(response.data.data || []);
+    
     } catch (error) {
-      setLoading(false);
-      console.error(
-        "Error fetching campaign data:",
-        error.response ? error.response.data : error.message
+      setMessage(
+        error.response?.data?.message || "Error fetching Facebook insights"
       );
-      return [];
+    } finally {
+      setIsFetchingFromFacebook(false);
     }
   };
 
-  const loadCampaignData = async () => {
-    let accountId = null;
-
-    if (typeof selectedAccount === "string") {
-      accountId = selectedAccount;
-    } else if (typeof selectedAccount === "object") {
-      accountId = selectedAccount.id || selectedAccount.accountId;
+  // Get Insights from Database
+  const getInsights = async (page = 1, limit = 10) => {
+    if (!selectedAccount?.id) {
+      setMessage("Error: Account ID is missing.");
+      return;
     }
+    try {
+      const response = await axios.get(`${MONGO_URI}/api/facebook/${selectedAccount.id}`, {
+        params: { page, limit },
+      });
+      setInsights(response.data.data || []);
+      setPagination(response.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 });
+      setMessage("Insights retrieved successfully");
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Error retrieving insights");
+    }
+  };
 
-    if (accountId) {
-      const initialUrl = ``;
-      // const initialUrl = `https://graph.facebook.com/v17.0/act_${accountId}/campaigns?fields=id,name,status,objective,start_time`;
-      const allCampaignData = await fetchAllCampaignData(initialUrl);
-
-      setData(allCampaignData);
-      setCampaignDetails(allCampaignData);
+  // Handle Pagination Change
+  const handlePageChange = (newPage) => {
+    if (isFetchingFromFacebook) {
+      // Paginate Facebook API data locally
+      const startIndex = (newPage - 1) * pagination.limit;
+      const endIndex = startIndex + pagination.limit;
+      const paginatedData = insights.slice(startIndex, endIndex);
+      setInsights(paginatedData);
+      setPagination((prev) => ({ ...prev, page: newPage }));
     } else {
-      console.error("Invalid selectedAccount:", selectedAccount);
+      // Fetch paginated data from the database
+      getInsights(newPage);
     }
   };
-
-  useEffect(() => {
-    if (selectedAccount) {
-      loadCampaignData();
-    }
-  }, [selectedAccount]);
-
-  useEffect(() => {
-    if (mongoData?.totalPages) {
-      setApitotalpage(mongoData.totalPages);
-    }
-  }, [mongoData]);
-
-  const handleFileChange = (event) => {
-    const file = event.target.files && event.target.files[0];
-    setSelectedFile(file);
-    setError("");
-  };
-
-  const handleFileSave = () => {
-    if (!selectedFile) {
-      setError("Please choose a valid file.");
-    } else {
-      setIsModalOpen(false);
-    }
-  };
-
-  const filterData = (data, searchQuery) => {
-    if (!searchQuery) return data;
-
-    const searchTerm = searchQuery.toLowerCase();
-
-    return data.filter((row) => {
-      return (
-        (row.name && row.name.toLowerCase().includes(searchTerm)) ||
-        (row._id && row._id.toLowerCase().includes(searchTerm)) ||
-        (row.brand && row.brand.toLowerCase().includes(searchTerm)) ||
-        (row.city && row.city.toLowerCase().includes(searchTerm)) ||
-        (row.phone && row.phone.toLowerCase().includes(searchTerm)) ||
-        (row.email && row.email.toLowerCase().includes(searchTerm)) ||
-        (row.source && row.source.toLowerCase().includes(searchTerm)) ||
-        (row.brand && row.brand.toLowerCase().includes(searchTerm)) ||
-        (row.createdOn && row.createdOn.toLowerCase().includes(searchTerm))
-      );
-    });
-  };
-
-  const totalCount = campaignDetails.length;
-
-
-  useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        const response = await axios.get(``, {
-          params: {
-            page: currentPage + 1,
-            pageSize: rowsPerPage,
-            search: search,
-            sortOrder: "asc",
-            startDate: startDate,
-            endDate: endDate,
-          },
-        });
-
-        if (response.data.leads) {
-          setMongoData(response.data);
-          setCampaignDetails(response.data.leads);
-          setCurrentPage(response.data.currentPage - 1);
-          setTotalPages(response.data.totalPages);
-          setTotalReport(response.data.totalLeads);
-        } else {
-          console.error("No report found in the response");
-        }
-      } catch (error) {
-        console.error("Error fetching report data:", error);
-      }
-    };
-
-    fetchCampaigns();
-  }, [currentPage, rowsPerPage, startDate, endDate]);
-
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(Number(event.target.value));
-    setCurrentPage(0);
-  };
-
-  //
-
-  const [filters, setFilters] = useState({
-    datePreset: "",
-    format: "",
-  });
-
-  const closeModal = () => setIsModalOpen(false);
-  const openModal = () => setIsModalOpen(true);
-
-  const openExportModal = () => setIsExportModalOpen(true); // Open modal
-  const closeExportModal = () => setIsExportModalOpen(false); // Close modal
-
-  const handleApplyFilters = (newFilters) => {
-    setFilters(newFilters);
-  };
-
-  const { datePreset, format } = filters;
-
-  const filterByDate = (details, preset) => {
-    const currentDate = new Date();
-    let filteredData = [];
-
-    if (!Array.isArray(details) || details.length === 0) {
-      console.warn("No details available to filter");
-      return [];
-    }
-
-    switch (preset) {
-      case "last-7-days": {
-        const last7Days = new Date();
-        last7Days.setDate(currentDate.getDate() - 7);
-        last7Days.setHours(0, 0, 0, 0);
-
-        filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= last7Days;
-        });
-        break;
-      }
-
-      case "last-14-days": {
-        const last14Days = new Date();
-        last14Days.setDate(currentDate.getDate() - 14);
-        last14Days.setHours(0, 0, 0, 0);
-
-        filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= last14Days;
-        });
-        break;
-      }
-
-      //
-
-      case "last-30-days": {
-        const last30Days = new Date();
-        last30Days.setDate(currentDate.getDate() - 30);
-        last30Days.setHours(0, 0, 0, 0);
-
-        filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= last30Days;
-        });
-        break;
-      }
-
-      case "yesterday": {
-        const yesterday = new Date();
-        yesterday.setDate(currentDate.getDate() - 1);
-        yesterday.setHours(0, 0, 0, 0);
-
-        filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= yesterday;
-        });
-        break;
-      }
-
-      case "last-day": {
-        const lastDay = new Date();
-        lastDay.setDate(currentDate.getDate() - 1);
-        lastDay.setHours(0, 0, 0, 0);
-
-        filteredData = details.filter((detail) => {
-          const createdDate = detail.createdOn
-            ? new Date(detail.createdOn)
-            : null;
-          if (createdDate) createdDate.setHours(0, 0, 0, 0);
-          return createdDate && createdDate >= lastDay;
-        });
-        break;
-      }
-
-      //
-
-      case "custom-range": {
-        if (startDate && endDate) {
-          const customStartDate = new Date(startDate);
-          const customEndDate = new Date(endDate);
-          customStartDate.setHours(0, 0, 0, 0);
-          customEndDate.setHours(23, 59, 59, 999);
-
-          filteredData = details.filter((detail) => {
-            const createdDate = detail.createdOn
-              ? new Date(detail.createdOn)
-              : null;
-            return (
-              createdDate &&
-              createdDate >= customStartDate &&
-              createdDate <= customEndDate
-            );
-          });
-        }
-        break;
-      }
-
-      default:
-        filteredData = details;
-        break;
-    }
-
-    return filteredData;
-  };
-
-  const getFilteredData = () => {
-    let dataToFilter = [];
-
-    if (Array.isArray(mongoData?.leads) && mongoData?.leads.length > 0) {
-      dataToFilter = mongoData.leads;
-    } else if (Array.isArray(mydata) && mydata.length > 0) {
-      dataToFilter = mydata;
-    }
-
-    const searchFilteredData = filterData(dataToFilter, search);
-
-    const finalFilteredData = filterByDate(
-      searchFilteredData,
-      datePreset,
-      startDate,
-      endDate
-    );
-
-    return finalFilteredData;
-  };
-
-  const filteredData = getFilteredData();
-
-  //
 
   return (
     <div className="home">
-    
-
-      <FilterModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        Base={false}
-        onApplyFilters={handleApplyFilters}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-      />
-
-      {/*  */}
-      <Export
-        name="report"
-        isOpen={isExportModalOpen}
-        onClose={closeExportModal} // Close handler
-        data={filteredData}
-        filename={`campaign_data_${new Date().toISOString()}.csv`}
-        filters={filters}
-      />
-      {/*  */}
-
       <div className="homeContainer">
         <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
-          <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
-            Report
+          <h1 className="text-2xl font-semibold text-gray-800 text-center">
+            Reports
           </h1>
-          <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
-          
-
-            <button
-              className="open-modal-btn flex items-center justify-center bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700 transition duration-200 w-full md:w-auto"
-              onClick={() => setIsExportModalOpen(true)}
-            >
-              <MdFileUpload className="mr-2 my-3" />
-              <span className="btn-text">Export Report</span>
-            </button>
-
-            <button
-              className="filter-btn flex items-center justify-center bg-green-600 text-white rounded-md px-4 py-2 hover:bg-green-700 transition duration-200 w-full md:w-auto"
-              onClick={openModal}
-            >
-              <IoMdAdd className="mr-2" />
-              <span className="btn-text">New Filter</span>
-            </button>
+          <div className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center ">
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700">
+                Start Date
+              </label>
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                className="border rounded-md p-2"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700">
+                End Date
+              </label>
+              <DatePicker
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                className="border rounded-md p-2"
+              />
+            </div>
           </div>
         </div>
+      </div>
 
-        <div
-          className={` md:w-[90%]   bg-white shadow-md rounded-lg p-4 ${
-            isSidebarOpen ? "md:ml-16 lg:ml-16" : "md:ml-20"
-          }`}
-        >
+      {/* Date Range Picker */}
+     
 
-          <div className="overflow-x-auto">
-            <table className="min-w-max table-auto">
-              <thead>
-                <tr className="bg-gray-800 text-white text-left">
-                  <th>#</th>
-                  <th>Account</th>
-                  <th>Source </th>
-                  <th>Budget </th>
-                  <th>Expense Ad</th>
-                  <th>Daily Visitors</th>
-                  <th>Daily Reach</th>
-                  <th>Daily Impressions</th>
-                  <th>Daily Frequency</th>
-                  <th>Daily CTR</th>
-                  <th>Daily CPP</th>
-                  <th>Daily CPC</th>
-                  <th>Daily CPM</th>
-                  <th>Daily Cost Per Unique Click</th>
-                  <th>Daily Click </th>
-                  <th>Daily Inline Link Click CTR </th>
-                  <th>Daily Inline Link Clicks </th>
+      <button
+        onClick={fetchAndStoreInsights}
+        className="bg-green-500 text-white m-4 p-2 rounded"
+      >
+        Fetch and Store Insights
+      </button>
+      <button
+        onClick={() => getInsights()}
+        className="bg-red-500 text-white m-4 p-2 rounded"
+      >
+        Get Insights
+      </button>
+
+      {message && <p className="m-4 text-red-600">{message}</p>}
+
+      {/* Insights Table */}
+      <div className="md:w-[90%] bg-white shadow-md rounded-lg p-4 lg:ml-16 md:ml-20">
+        <div className="overflow-x-auto">
+          <table className="min-w-max table-auto">
+            <thead>
+              <tr className="bg-gray-800 text-white text-left">
+                <th>#</th>
+                <th>Campaign</th>
+                <th>Spend</th>
+                <th>Reach</th>
+                <th>Impressions</th>
+                <th>CTR</th>
+                <th>CPP</th>
+                <th>CPC</th>
+                <th>CPM</th>
+                <th>Cost Per Unique Click</th>
+                <th>Clicks</th>
+                <th>Inline Link Click Ctr</th>
+                <th>Inline Link Clicks</th>
+                <th>Adset Name</th>
+                <th>Date Start</th>
+                <th>Date Stop</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-700">
+              {insights.length > 0 ? (
+                insights.map((insight, index) => (
+                  <tr key={insight.id}>
+                    <td>{index + 1}</td>
+                    <td>{insight.campaign_name}</td>
+                    <td>{insight.spend}</td>
+                    <td>{insight.reach}</td>
+                    <td>{insight.impressions}</td>
+                    <td>{insight.ctr}</td>
+                    <td>{insight.cpp}</td>
+                    <td>{insight.cpc}</td>
+                    <td>{insight.cpm}</td>
+                    <td>{insight.cost_per_unique_click}</td>
+                    <td>{insight.clicks}</td>
+                    <td>{insight.inline_link_click_ctr}</td>
+                    <td>{insight.inline_link_clicks}</td>
+                    <td>{insight.adset_name}</td>
+                    <td>{insight.date_start}</td>
+                    <td>{insight.end_date}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="16" className="text-center p-4">
+                    No data available
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                {loading ? (
-                  <tr>
-                    <td colSpan="7" className="text-center py-4">
-                      Loading...
-                    </td>
-                  </tr>
-                ) : (
-                  <tr>
-                    <td>index</td>
-                    <td data-label="Account">{selectedAccount?.name}</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td>7</td>
-                    <td>8</td>
-                    <td>9</td>
-                    <td>10</td>
-                    <td>11</td>
-                    <td>12</td>
-                    <td>13</td>
-                    <td>14</td>
-                    <td>15</td>
-                    <td>16</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-        
+              )}
+            </tbody>
+          </table>
         </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={() => handlePageChange(pagination.page - 1)}
+          disabled={pagination.page === 1}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md mx-1 disabled:bg-gray-300"
+        >
+          Previous
+        </button>
+        <span className="mx-4">
+          Page {pagination.page} of {pagination.totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(pagination.page + 1)}
+          disabled={pagination.page === pagination.totalPages}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md mx-1 disabled:bg-gray-300"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
