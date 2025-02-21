@@ -163,6 +163,7 @@ const Reports = () => {
                 <th>SelectedAccount</th>
                 <th>Campaign</th>
                 <th>Adset Name</th>
+                <th>Active Users</th>
                 <th>Spend</th>
                 <th>Reach</th>
                 <th>Impressions</th>
@@ -187,6 +188,7 @@ const Reports = () => {
                     <td>{selectedAccount.name}</td>
                     <td>{insight.campaign_name}</td>
                     <td>{insight.adset_name}</td>
+                    <td>{insight.activeUsers}</td>
                     <td>{insight.spend}</td>
                     <td>{insight.reach}</td>
                     <td>{insight.impressions}</td>
