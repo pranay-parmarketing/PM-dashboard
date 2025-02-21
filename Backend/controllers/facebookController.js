@@ -181,6 +181,95 @@
 const axios = require("axios");
 const FacebookAdInsight = require("../models/Facebookinsight");
 
+// const fetchAndStoreFacebookInsights = async (req, res) => {
+//   try {
+//     const { access_token, appsecret_proof, start_date, end_date, account_id } = req.body;
+
+//     console.log("Received Params:", { access_token, appsecret_proof, start_date, end_date, account_id });
+
+//     if (!account_id || !access_token || !appsecret_proof || !start_date || !end_date) {
+//       return res.status(400).json({ message: "Missing required parameters" });
+//     }
+
+//     const formattedStartDate = new Date(start_date).toISOString().split("T")[0];
+//     const formattedEndDate = new Date(end_date).toISOString().split("T")[0];
+
+//     if (new Date(formattedStartDate) > new Date(formattedEndDate)) {
+//       return res.status(400).json({ message: "Invalid date range: start_date must be before or equal to end_date" });
+//     }
+
+//     // Check if data already exists for the given date range (Sort results in ascending order)
+//     const existingData = await FacebookAdInsight.find({
+//       account_id,
+//       date_start: { $gte: formattedStartDate, $lte: formattedEndDate },
+//     }).sort({ date_start: 1 });
+
+//     if (existingData.length > 0) {
+//       return res.status(200).json({ message: "Data fetched from database", data: existingData });
+//     }
+
+//     let facebookApiUrl = `https://graph.facebook.com/v17.0/act_${account_id}/insights?fields=campaign_id,campaign_name,spend,reach,impressions,frequency,ctr,cpp,cpc,cpm,cost_per_unique_click,clicks,inline_link_click_ctr,inline_link_clicks,adset_name,date_start,date_stop&level=adset&time_increment=1&limit=10000&time_range={"since":"${formattedStartDate}","until":"${formattedEndDate}"}&access_token=${access_token}&appsecret_proof=${appsecret_proof}`;
+
+//     let allInsights = [];
+
+//     do {
+//       try {
+//         const response = await axios.get(facebookApiUrl);
+//         console.log("Facebook API Response Dates:", response.data.data.map(d => d.date_start));
+
+
+//         if (response.data && response.data.data.length > 0) {
+//           const bulkOperations = response.data.data.map(insight => ({
+//             updateOne: {
+//               filter: { 
+//                 account_id,
+//                 campaign_id: insight.campaign_id,
+//                 adset_name: insight.adset_name,
+//                 date_start: insight.date_start,
+//               },
+//               update: {
+//                 $set: {
+//                   account_id,
+//                   start_date: formattedStartDate,
+//                   end_date: formattedEndDate,
+//                   date_start: insight.date_start,
+//                   date_stop: insight.date_stop || formattedEndDate,
+//                   ...insight,
+//                 },
+//               },
+//               upsert: true,
+//             }
+//           }));
+
+//           await FacebookAdInsight.bulkWrite(bulkOperations);
+//           allInsights.push(...response.data.data);
+//         }
+
+//         // Check for next page
+//         facebookApiUrl = response.data.paging?.next || null;
+//       } catch (apiError) {
+//         console.error("Error fetching from Facebook API:", apiError.response?.data || apiError.message);
+//         facebookApiUrl = null; // Stop loop on error
+//       }
+//     } while (facebookApiUrl);
+
+//     if (allInsights.length > 0) {
+//       // Sort fetched data in ascending order before sending response
+//       allInsights.sort((a, b) => new Date(a.date_start) - new Date(b.date_start));
+
+//       return res.status(201).json({
+//         message: "New Facebook Ad Insights stored successfully",
+//         data: allInsights,
+//       });
+//     } else {
+//       return res.status(404).json({ message: "No data found for the given date range" });
+//     }
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ message: "Failed to fetch and store Facebook insights" });
+//   }
+// };
+
 const fetchAndStoreFacebookInsights = async (req, res) => {
   try {
     const { access_token, appsecret_proof, start_date, end_date, account_id } = req.body;
@@ -198,23 +287,15 @@ const fetchAndStoreFacebookInsights = async (req, res) => {
       return res.status(400).json({ message: "Invalid date range: start_date must be before or equal to end_date" });
     }
 
-    // Check if data already exists for the given date range (Sort results in ascending order)
-    const existingData = await FacebookAdInsight.find({
-      account_id,
-      date_start: { $gte: formattedStartDate, $lte: formattedEndDate },
-    }).sort({ date_start: 1 });
-
-    if (existingData.length > 0) {
-      return res.status(200).json({ message: "Data fetched from database", data: existingData });
-    }
-
-    let facebookApiUrl = `https://graph.facebook.com/v17.0/act_${account_id}/insights?fields=campaign_id,campaign_name,spend,reach,impressions,frequency,ctr,cpp,cpc,cpm,cost_per_unique_click,clicks,inline_link_click_ctr,inline_link_clicks,adset_name,date_start,date_stop&level=adset&time_increment=1&limit=100&time_range={"since":"${formattedStartDate}","until":"${formattedEndDate}"}&access_token=${access_token}&appsecret_proof=${appsecret_proof}`;
+    // Fetch data directly from Facebook API
+    let facebookApiUrl = `https://graph.facebook.com/v17.0/act_${account_id}/insights?fields=campaign_id,campaign_name,spend,reach,impressions,frequency,ctr,cpp,cpc,cpm,cost_per_unique_click,clicks,inline_link_click_ctr,inline_link_clicks,adset_name,date_start,date_stop&level=adset&time_increment=1&limit=10000&time_range={"since":"${formattedStartDate}","until":"${formattedEndDate}"}&access_token=${access_token}&appsecret_proof=${appsecret_proof}`;
 
     let allInsights = [];
 
     do {
       try {
         const response = await axios.get(facebookApiUrl);
+        console.log("Facebook API Response Dates:", response.data.data.map(d => d.date_start));
 
         if (response.data && response.data.data.length > 0) {
           const bulkOperations = response.data.data.map(insight => ({
@@ -235,11 +316,13 @@ const fetchAndStoreFacebookInsights = async (req, res) => {
                   ...insight,
                 },
               },
-              upsert: true,
+              upsert: true, // Insert if not exist, update if exists
             }
           }));
 
+          // Save to DB
           await FacebookAdInsight.bulkWrite(bulkOperations);
+
           allInsights.push(...response.data.data);
         }
 
@@ -256,8 +339,8 @@ const fetchAndStoreFacebookInsights = async (req, res) => {
       allInsights.sort((a, b) => new Date(a.date_start) - new Date(b.date_start));
 
       return res.status(201).json({
-        message: "New Facebook Ad Insights stored successfully",
-        data: allInsights,
+        message: "New Facebook Ad Insights fetched and stored successfully",
+        data: allInsights, // Send only fetched API data
       });
     } else {
       return res.status(404).json({ message: "No data found for the given date range" });
@@ -267,7 +350,6 @@ const fetchAndStoreFacebookInsights = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch and store Facebook insights" });
   }
 };
-
 
 const getFacebookInsights = async (req, res) => {
   try {

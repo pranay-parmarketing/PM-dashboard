@@ -35,6 +35,10 @@ const Reports = () => {
     setEndDate(yesterday);
   }, []);
 
+  useEffect(() => {
+    fetchAndStoreInsights();
+  }, [selectedAccount]); 
+
   // Fetch and Store Facebook Insights
   const fetchAndStoreInsights = async () => {
     if (!selectedAccount?.id || !access_token) {
@@ -51,7 +55,7 @@ const Reports = () => {
         start_date: startDate?.toISOString().split("T")[0],
         end_date: endDate?.toISOString().split("T")[0],
       });
-
+      setPagination(response.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 });
       setMessage(
         response.data.message || "Facebook Insights fetched successfully"
       );
@@ -138,16 +142,16 @@ const Reports = () => {
         onClick={fetchAndStoreInsights}
         className="bg-green-500 text-white m-4 p-2 rounded"
       >
-        Fetch and Store Insights
+        Fetch Data
       </button>
       <button
         onClick={() => getInsights()}
         className="bg-red-500 text-white m-4 p-2 rounded"
       >
-        Get Insights
+        Get All Data
       </button>
 
-      {message && <p className="m-4 text-red-600">{message}</p>}
+      {message && <p className="m-4 text-green-600">{message}</p>}
 
       {/* Insights Table */}
       <div className="md:w-[90%] bg-white shadow-md rounded-lg p-4 lg:ml-16 md:ml-20">
@@ -156,7 +160,9 @@ const Reports = () => {
             <thead>
               <tr className="bg-gray-800 text-white text-left">
                 <th>#</th>
+                <th>SelectedAccount</th>
                 <th>Campaign</th>
+                <th>Adset Name</th>
                 <th>Spend</th>
                 <th>Reach</th>
                 <th>Impressions</th>
@@ -168,7 +174,7 @@ const Reports = () => {
                 <th>Clicks</th>
                 <th>Inline Link Click Ctr</th>
                 <th>Inline Link Clicks</th>
-                <th>Adset Name</th>
+                
                 <th>Date Start</th>
                 <th>Date Stop</th>
               </tr>
@@ -178,7 +184,9 @@ const Reports = () => {
                 insights.map((insight, index) => (
                   <tr key={insight.id}>
                     <td>{index + 1}</td>
+                    <td>{selectedAccount.name}</td>
                     <td>{insight.campaign_name}</td>
+                    <td>{insight.adset_name}</td>
                     <td>{insight.spend}</td>
                     <td>{insight.reach}</td>
                     <td>{insight.impressions}</td>
@@ -190,9 +198,9 @@ const Reports = () => {
                     <td>{insight.clicks}</td>
                     <td>{insight.inline_link_click_ctr}</td>
                     <td>{insight.inline_link_clicks}</td>
-                    <td>{insight.adset_name}</td>
+                    
                     <td>{insight.date_start}</td>
-                    <td>{insight.end_date}</td>
+                    <td>{insight.date_stop}</td>
                   </tr>
                 ))
               ) : (
