@@ -240,7 +240,7 @@ const fetchDMPCount = async () => {
 
 const fetchLeadsentCount = async () => {
   try {
-    const response = await axios.get(`${MONGO_URI}/api/dmp`); // Replace with actual API endpoint
+    const response = await axios.get(`${MONGO_URI}/api/leadsent`); // Replace with actual API endpoint
     return response.data.yesterdayCount; // Assuming API returns dmpCount
   } catch (error) {
     console.error("Error fetching DMP Count:", error);

@@ -18,7 +18,7 @@ const Export = ({
     let filteredData = data;
 
     
-    const dateField = name === "lead" ? "createdOn" : name === "dmp" ? "call_start_time" : name === "enrolle" ? "date" : null;
+    const dateField = name === "lead" ? "createdOn" : name === "dmp" ? "call_start_time" : name === "leadsent"? 'call_start_time' : name === "enrolle" ? "date" : null;
 
 
     

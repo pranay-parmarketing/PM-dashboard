@@ -22,6 +22,7 @@ const enrolleRoute = require('./routes/enrolleRoute.js');
 const packsentRoute = require('./routes/packsentRoute.js'); 
 const analyticsRoutes = require('./routes/analyticsRoutes.js'); 
 const facebookRoutes = require('./routes/facebookRoutes.js'); 
+const leadsentRoutes = require('./routes/leadsentRoutes.js'); 
 
 const cron = require("node-cron");
 
@@ -64,6 +65,7 @@ app.use('/api/dmp',dmpRoute)
 app.use('/api/sent-leads',sentleadRoute)
 app.use('/api/packsent',packsentRoute)
 app.use('/api/facebook', facebookRoutes);
+app.use('/api/leadsent', leadsentRoutes);
 // app.use('/api/visitorcount',analyticsRoutes)
 
 const fetch = require('node-fetch');

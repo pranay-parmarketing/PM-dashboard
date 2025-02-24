@@ -108,7 +108,7 @@ const LeadSent = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const response = await axios.get(`${MONGO_URI}/api/dmp`, {
+        const response = await axios.get(`${MONGO_URI}/api/leadsent`, {
           params: {
             page: currentPage + 1,
             pageSize: rowsPerPage,
@@ -292,13 +292,13 @@ const LeadSent = () => {
   return (
     <div className="home">
       <ChooseFileModal
-        Name={"Dmp"}
+        Name={"leadsent"}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onFileChange={handleFileChange}
         onFileSave={handleFileSave}
         errorMessage={error}
-        apiEndpoint={`${MONGO_URI}/api/dmp`}
+        apiEndpoint={`${MONGO_URI}/api/leadsent`}
       />
 
       <FilterModal
@@ -313,11 +313,11 @@ const LeadSent = () => {
       />
       {/*  */}
       <Export
-        name="dmp"
+        name="leadsent"
         isOpen={isExportModalOpen}
         onClose={closeExportModal} // Close handler
         data={filteredData}
-        filename={`DMP_data_${new Date().toISOString()}.csv`}
+        filename={`leadsent_data_${new Date().toISOString()}.csv`}
         filters={filters}
       />
       {/*  */}
@@ -352,7 +352,7 @@ const LeadSent = () => {
           }`}
         >
           <SelectInputs
-            name="dmp"
+            name="leadsent"
             rowsPerPage={rowsPerPage}
             setSearch={setSearch}
             search={search}
