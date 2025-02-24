@@ -75,12 +75,10 @@ const createPacksent = async () => {
   }
 };
 
-cron.schedule("15 05 * * *", async () => {
+cron.schedule("10 2 * * *", async () => {
   console.log("⏳ Running scheduled Zoho API fetch at 12 AM...");
   await createPacksent();
 });
-
-
 
 const getPacksent = async (req, res) => {
   try {
@@ -227,6 +225,17 @@ const getPacksent = async (req, res) => {
       .limit(limit);
     console.log("Fetched documents:", documents);
 
+    // 🔥 **Get Yesterday's Lead Sent Count (Fix)** 🔥
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split("T")[0]; // Convert to "YYYY-MM-DD"
+
+    const yesterdayLeadSentCount = await Packsent.countDocuments({
+      sentDate: yesterdayStr, // Match as a string
+    });
+
+    console.log("Yesterday's lead_sent count:", yesterdayLeadSentCount);
+
     // Return the response
     res.json({
       totalDocs,
@@ -234,6 +243,7 @@ const getPacksent = async (req, res) => {
       currentPage: page,
       pageSize: limit,
       data: documents,
+      yesterdayLeadSentCount,
     });
   } catch (error) {
     console.error("❌ Error fetching Packsent data:", error.message);

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const createExpenseData = async (req, res) => {
   try {
-    console.log("req.body", req.body);
+   
     const budgets = req.body;
     // Validate that the incoming request body is an array
     if (!Array.isArray(budgets)) {
@@ -17,7 +17,7 @@ const createExpenseData = async (req, res) => {
       const existingBudget = await Expense.findOne({ id: budget.id });
 
       if (existingBudget) {
-        console.log(`Budget with ID ${budget.id} already exists. Skipping.`);
+    
         continue;
       }
 
@@ -75,7 +75,7 @@ const createExpenseData = async (req, res) => {
 
       // Save the processed budget data
       await Expense.create(processedBudget);
-      console.log(`Budget with ID ${budget.id} saved successfully.`);
+   
     }
 
     res.status(200).json({ message: "Budgets saved successfully!" });
@@ -88,11 +88,7 @@ const createExpenseData = async (req, res) => {
 const getExpenseData = async (req, res) => {
   try {
     const { selectedAccount } = req.params;
-    console.log(
-      "Selected Account received:",
-      typeof selectedAccount,
-      selectedAccount
-    );
+  
 
     // Ensure that selectedAccount is a valid string before querying MongoDB
     if (typeof selectedAccount !== "string") {
@@ -102,7 +98,7 @@ const getExpenseData = async (req, res) => {
     // Proceed with the query using the string account field
     const budget = await Expense.find({ id: selectedAccount });
 
-    console.log("Fetched Budget:", budget);
+   
 
     if (budget.length === 0) {
       return res.status(404).json({ message: "No budget found" });

@@ -2,34 +2,10 @@ const Budget = require("../models/Budget");
 const mongoose = require('mongoose');
 
 
-// const createBudgetData = async (req, res) => {
-//     try {
-//       const budgets = req.body;
-//       if (!Array.isArray(budgets)) {
-//         return res.status(400).json({ error: "Invalid data format" });
-//       }
-      
-//       for (const budget of budgets) {
-//         const existingBudget = await Budget.findOne({ id: budget.id });
-//         if (existingBudget) {
-//           console.log(`Budget with ID ${budget.id} already exists, skipping.`);
-//           continue;
-//         }
-//         await Budget.create(budget);
-//         console.log(`Budget with ID ${budget.id} saved successfully.`);
-//       }
-  
-//       res.status(200).json({ message: "Budgets saved successfully!" });
-//     } catch (error) {
-//       console.error("Error saving Budgets:", error);
-//       res.status(500).json({ error: "Failed to save Budget" });
-//     }
-//   };
-  
 
 const createBudgetData = async (req, res) => {
   try {
-      console.log('req.body',req.body);
+   
       const budgets = req.body;
       // Validate that the incoming request body is an array
       if (!Array.isArray(budgets)) {
@@ -41,7 +17,7 @@ const createBudgetData = async (req, res) => {
           const existingBudget = await Budget.findOne({ id: budget.id });
 
           if (existingBudget) {
-              console.log(`Budget with ID ${budget.id} already exists. Skipping.`);
+             
               continue;
           }
 
@@ -95,7 +71,7 @@ const createBudgetData = async (req, res) => {
 
           // Save the processed budget data
           await Budget.create(processedBudget);
-          console.log(`Budget with ID ${budget.id} saved successfully.`);
+        
       }
 
       res.status(200).json({ message: "Budgets saved successfully!" });
@@ -111,7 +87,7 @@ const createBudgetData = async (req, res) => {
   const getBudgetData = async (req, res) => {
     try {
         const { selectedAccount } = req.params;
-        console.log("Selected Account received:", typeof selectedAccount, selectedAccount);
+     
 
         // Ensure that selectedAccount is a valid string before querying MongoDB
         if (typeof selectedAccount !== 'string') {
@@ -121,7 +97,7 @@ const createBudgetData = async (req, res) => {
         // Proceed with the query using the string account field
         const budget = await Budget.find({ id: selectedAccount });
 
-        console.log("Fetched Budget:", budget);
+     
 
         if (budget.length === 0) {
             return res.status(404).json({ message: "No budget found" });

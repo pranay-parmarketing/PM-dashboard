@@ -251,8 +251,8 @@ const fetchLeadsentCount = async () => {
 // 
 const fetchPackSentCount = async () => {
   try {
-    const response = await axios.get(`${MONGO_URI}/api/dmp`); // Replace with actual API endpoint
-    return response.data.yesterdayCount; // Assuming API returns dmpCount
+    const response = await axios.get(`${MONGO_URI}/api/packsent`); 
+    return response.data.yesterdayLeadSentCount; 
   } catch (error) {
     console.error("Error fetching DMP Count:", error);
     return "0";
@@ -261,8 +261,8 @@ const fetchPackSentCount = async () => {
 
 const fetchEnrolledCount = async () => {
   try {
-    const response = await axios.get(`${MONGO_URI}/api/dmp`); // Replace with actual API endpoint
-    return response.data.yesterdayCount; // Assuming API returns dmpCount
+    const response = await axios.get(`${MONGO_URI}/api/enrolle`); 
+    return response.data.yesterdayEnrolleeCount; 
   } catch (error) {
     console.error("Error fetching DMP Count:", error);
     return "0";

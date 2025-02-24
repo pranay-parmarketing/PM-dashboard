@@ -1,11 +1,8 @@
-
 const multer = require("multer");
 const XLSX = require("xlsx");
 const Campaign = require("../models/Campaign");
 
 const upload = multer({ storage: multer.memoryStorage() });
-
-
 
 const createCampaignsData = async (req, res) => {
   try {
@@ -15,7 +12,6 @@ const createCampaignsData = async (req, res) => {
     if (req.body && Object.keys(req.body).length > 0) {
       campaigns = Array.isArray(req.body) ? req.body : [req.body];
     }
-    console.log("campaigns", campaigns);
 
     // Process Excel file (if uploaded)
     if (req.file) {
@@ -41,9 +37,6 @@ const createCampaignsData = async (req, res) => {
       const existingCampaign = await Campaign.findOne({ id: campaign.id });
 
       if (existingCampaign) {
-        console.log(
-          `Campaign with ID ${campaign.id} already exists, skipping.`
-        );
         continue;
       }
 
@@ -57,17 +50,12 @@ const createCampaignsData = async (req, res) => {
   }
 };
 
-
-
-
 const getCampaignsData = async (req, res) => {
   try {
     const { selectedAccount } = req.params; // Extract selectedAccount from URL parameters
-    console.log("Selected account parameter:", selectedAccount);
 
     // Query the database to find campaigns for the selected account
     const campaigns = await Campaign.find({ account_id: selectedAccount }); // Ensure the field name matches your schema
-    console.log("Fetched campaigns from DB:", campaigns);
 
     if (!campaigns || campaigns.length === 0) {
       console.warn(`No campaigns found for account: ${selectedAccount}`);
@@ -91,7 +79,6 @@ const updateCampaignsData = async (req, res) => {
 
   try {
     // Find the account by ID and update the fields
-    console.log("this is id", selectedAccount);
 
     const updatedCampaign = await Campaign.findByIdAndUpdate(
       selectedAccount,

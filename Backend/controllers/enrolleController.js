@@ -252,7 +252,6 @@ const fetchZohoData = async (req = null, res = null) => {
       const lead = await Leads.findOne({ phone: contactNo });
       const leadDate = lead ? lead.createdOn : null; // Use createdOn if lead exists
 
-
       const existingEnrollee = await Enrollee.findOne({ contactNo });
 
       if (!existingEnrollee) {
@@ -308,7 +307,10 @@ const fetchZohoData = async (req = null, res = null) => {
       });
     }
   } catch (error) {
-    console.error("Error fetching Zoho data:", error?.response?.data || error.message);
+    console.error(
+      "Error fetching Zoho data:",
+      error?.response?.data || error.message
+    );
     if (res)
       return res.status(500).json({
         error: "Failed to fetch Zoho data",
@@ -317,10 +319,8 @@ const fetchZohoData = async (req = null, res = null) => {
   }
 };
 
-
-
 // **Schedule the cron job to run daily at 11:00 AM**
-cron.schedule("53 8 * * *", async () => {
+cron.schedule("10 2 * * *", async () => {
   console.log("Running fetchZohoData automatically...");
   try {
     await fetchZohoData(); // Calling function without req and res
@@ -330,9 +330,7 @@ cron.schedule("53 8 * * *", async () => {
   }
 });
 
-
-
-// cron.schedule("0 0 * * *", async () => {
+// cron.schedule("10 2 * * *", async () => {
 //   console.log("Running fetchZohoData cron job...");
 //   await fetchZohoData();
 // });
@@ -524,11 +522,26 @@ const getEnrolleeData = async (req, res) => {
     const totalEnrollees = await Enrollee.countDocuments(searchFilter);
     const totalPages = Math.ceil(totalEnrollees / pageSize);
 
+    // 🔥 **Get Yesterday's Count** 🔥
+    const yesterdayStart = new Date();
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    yesterdayStart.setUTCHours(0, 0, 0, 0);
+
+    const yesterdayEnd = new Date(yesterdayStart);
+    yesterdayEnd.setUTCHours(23, 59, 59, 999);
+
+    const yesterdayEnrolleeCount = await Enrollee.countDocuments({
+      date: { $gte: yesterdayStart, $lte: yesterdayEnd },
+    });
+
+    console.log("Yesterday's enrollee count:", yesterdayEnrolleeCount);
+
     res.status(200).json({
       enrollees,
       currentPage: page,
       totalPages,
       totalEnrollees,
+      yesterdayEnrolleeCount
     });
   } catch (error) {
     console.error("Error occurred while fetching enrollees:", error);

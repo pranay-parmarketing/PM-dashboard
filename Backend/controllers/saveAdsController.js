@@ -14,7 +14,7 @@ const createAdsData = async (req, res) => {
     if (req.body && Object.keys(req.body).length > 0) {
       ads = Array.isArray(req.body) ? req.body : [req.body];
     }
-    console.log("Ads from JSON:", ads);
+    
     //
     // Process Excel file (if uploaded)
     if (req.file) {
@@ -42,10 +42,7 @@ const createAdsData = async (req, res) => {
 
       // If the ad already exists, skip it
       if (existingAd) {
-        console.log(
-          `Ad with Facebook Ad ID ${ad.id} already exists, skipping.`
-        );
-        console.log('facebookAdId',ad.id);
+     
         
         continue;
       }
@@ -85,7 +82,7 @@ const updateAdsData = async (req, res) => {
   const { accountName } = req.body;
   try {
   
-    console.log("this is id", selectedAccount);
+  
     const updatedAds = await Ad.findByIdAndUpdate(
       selectedAccount,
       { name: accountName },
