@@ -368,10 +368,11 @@ const LeadSent = () => {
               <thead>
                 <tr className="bg-gray-800 text-white text-left">
                   <th>#</th>
-                  <th>Lead Date</th>
+                  <th>Created On</th>
                   <th>Date </th>
                   <th>Phone </th>
                   <th>Source</th>
+                  <th>Lead Date</th>
 
                   <th>Transfer To</th>
                   <th>LVT Agent</th>
@@ -414,6 +415,7 @@ const LeadSent = () => {
                       </td>
                       <td>{row.phone || "N/A"}</td>
                       <td>{row.source || "N/A"}</td>
+                      <td>{row.lead_date  || "N/A"}</td>
                       <td>{"N/A"}</td>
                       <td>{row.agent_username || "N/A"}</td>
                     </tr>
