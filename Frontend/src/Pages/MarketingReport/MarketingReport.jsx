@@ -136,7 +136,7 @@ const MarketingReport = () => {
               <tr>
                 <th className="border border-gray-300 px-3 py-2">#</th>
                 <th className="border border-gray-300 px-3 py-2">Type</th>
-                <th className="border border-gray-300 px-3 py-2">
+                <th className="border border-gray-300 px-3 py-2">  
                   Source Name
                 </th>
                 <th className="border border-gray-300 px-3 py-2">Name</th>
