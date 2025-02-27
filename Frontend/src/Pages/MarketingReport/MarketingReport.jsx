@@ -22,6 +22,29 @@ const MarketingReport = () => {
   const { appsecret_proof, access_token, selectedAccount } =
     useContext(ApiTokenContext);
 
+  // Calculate totals
+  const calculateTotals = () => {
+    const totals = {
+      totalSpend: 0,
+      totalImpressions: 0,
+      totalReach: 0,
+      totalConversions: 0,
+      totalVisitors: 0,
+    };
+
+    insights.forEach((insight) => {
+      totals.totalSpend += insight.total_spend || 0;
+      totals.totalImpressions += insight.total_impressions || 0;
+      totals.totalReach += insight.total_reach || 0;
+      totals.totalConversions += insight.total_conversions || 0;
+      totals.totalVisitors += insight.total_visitors || 0;
+    });
+
+    return totals;
+  };
+
+  const totals = calculateTotals();
+
   // Fetch marketing report data
   const fetchMarketingReport = async () => {
     if (!startDate || !endDate || !selectedAccount?.id) {
@@ -136,7 +159,7 @@ const MarketingReport = () => {
               <tr>
                 <th className="border border-gray-300 px-3 py-2">#</th>
                 <th className="border border-gray-300 px-3 py-2">Type</th>
-                <th className="border border-gray-300 px-3 py-2">  
+                <th className="border border-gray-300 px-3 py-2">
                   Source Name
                 </th>
                 <th className="border border-gray-300 px-3 py-2">Name</th>
@@ -317,8 +340,39 @@ const MarketingReport = () => {
                 </tr>
               )}
             </tbody>
+            <tfoot className="bg-gray-300">
+              <tr>
+                <td
+                  colSpan="4"
+                  className="border border-gray-300 px-3 py-2 font-bold"
+                >
+                  Totals
+                </td>
+                <td className="border border-gray-300 px-3 py-2 font-bold">
+                  {totals.totalSpend?.toFixed(2) || "N/A"}
+                </td>
+                <td className="border border-gray-300 px-3 py-2 font-bold">
+                  {totals.totalImpressions || "N/A"}
+                </td>
+                <td className="border border-gray-300 px-3 py-2 font-bold">
+                  {totals.totalReach || "N/A"}
+                </td>
+                <td className="border border-gray-300 px-3 py-2 font-bold">
+                  {totals.totalConversions || "N/A"}
+                </td>
+                {/* Leaving CPC empty as it may not have a total */}
+                <td className="border border-gray-300 px-3 py-2"></td>
+                <td className="border border-gray-300 px-3 py-2 font-bold">
+                  {totals.totalVisitors || "N/A"}
+                </td>
+                {/* Status and Created At don't have totals */}
+                <td className="border border-gray-300 px-3 py-2"></td>
+                <td className="border border-gray-300 px-3 py-2"></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
+
         {/* Pagination */}
         <div className="flex justify-center mt-4">
           <button
