@@ -30,7 +30,7 @@ const Expense = () => {
   const [search, setSearch] = useState("");
   //
   const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");  
+  const [endDate, setEndDate] = useState("");
 
   const [mongoData, setMongoData] = useState({});
 
@@ -309,6 +309,34 @@ const Expense = () => {
             lastDay.toDateString()
         );
         break;
+        
+      case "custom-range": {
+        if (startDate && endDate) {
+          const customStartDate = new Date(startDate);
+          const customEndDate = new Date(endDate);
+          customStartDate.setHours(0, 0, 0, 0);
+          customEndDate.setHours(23, 59, 59, 999);
+
+          console.log("Filtering from:", customStartDate, "to", customEndDate);
+
+          filteredData = details.filter((detail) => {
+            const createdDate = detail.created_time
+              ? new Date(detail.created_time) // Explicitly parse ISO string
+              : null;
+
+            console.log("Checking:", createdDate);
+
+            return (
+              createdDate &&
+              createdDate >= customStartDate &&
+              createdDate <= customEndDate
+            );
+          });
+
+          console.log("Filtered Data:", filteredData);
+        }
+        break;
+      }
 
       case "all-time":
       default:
@@ -327,7 +355,7 @@ const Expense = () => {
     const fetchCampaigns = async () => {
       try {
         const campaignData = [];
-        for (let id of allIds) { 
+        for (let id of allIds) {
           const response = await axios.get(
             `${MONGO_URI}/api/save-expense/${id}`
           );

@@ -177,7 +177,7 @@ const Source = () => {
                         <td>{index + 1 + currentPage * rowsPerPage}</td>
                         <td>{row.campaign_name}</td>
                         <td>{row.source}</td>
-                        <td>{row.adsetname}</td>
+                        <td>{row.adset_name}</td>
                         <td>{selectedAccount.name}</td>
                       </tr>
                     ))
