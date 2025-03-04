@@ -320,7 +320,7 @@ const fetchZohoData = async (req = null, res = null) => {
 };
 
 // **Schedule the cron job to run daily at 11:00 AM**
-cron.schedule("10 2 * * *", async () => {
+cron.schedule("53 8 * * *", async () => {
   console.log("Running fetchZohoData automatically...");
   try {
     await fetchZohoData(); // Calling function without req and res
