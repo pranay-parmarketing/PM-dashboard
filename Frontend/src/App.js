@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import Login from "./Pages/Login/Login";
 import HomeDashboard from "./Pages/Home/HomeDashboard";
@@ -38,7 +38,15 @@ function App() {
   const shouldShowSidebar = !noSidebarRoutes.includes(
     location.pathname.toLowerCase()
   );
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage.clear();
+      console.log("LocalStorage cleared after 6 hours.");
+    }, 6 * 60 * 60 * 1000); // 6 hours
 
+    return () => clearTimeout(timeout); // Cleanup on unmount
+  }, []);
+  
   return (
     <div>
       {/* Conditionally render Sidebar */}

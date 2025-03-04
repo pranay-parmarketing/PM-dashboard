@@ -407,8 +407,9 @@ const getDmpData = async (req, res) => {
         $gte: startOfYesterday,
         $lte: endOfYesterday,
       },
+      first_disposition: "Explained DMP", 
     };
-
+    
     const yesterdayCount = await Dmp.countDocuments(yesterdayFilter);
 
     res.status(200).json({

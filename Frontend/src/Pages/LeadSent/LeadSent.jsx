@@ -162,8 +162,8 @@ const LeadSent = () => {
 
   const filterByDate = (details, preset, startDate = null, endDate = null) => {
     if (!Array.isArray(details) || details.length === 0) {
-        console.warn("No details available to filter");
-        return [];
+      console.warn("No details available to filter");
+      return [];
     }
 
     const currentDate = new Date();
@@ -171,90 +171,104 @@ const LeadSent = () => {
 
     // Helper function to get UTC start of the day
     const getUTCDate = (date) => {
-        const d = new Date(date);
-        d.setUTCHours(0, 0, 0, 0); // Convert to start of the day in UTC
-        return d;
+      const d = new Date(date);
+      d.setUTCHours(0, 0, 0, 0); // Convert to start of the day in UTC
+      return d;
     };
 
     // Helper function to get UTC end of the day
     const getUTCEndOfDay = (date) => {
-        const d = new Date(date);
-        d.setUTCHours(23, 59, 59, 999); // Convert to end of the day in UTC
-        return d;
+      const d = new Date(date);
+      d.setUTCHours(23, 59, 59, 999); // Convert to end of the day in UTC
+      return d;
     };
 
-    console.log("Current Date (UTC Start of the Day):", getUTCDate(currentDate));
+    console.log(
+      "Current Date (UTC Start of the Day):",
+      getUTCDate(currentDate)
+    );
 
     switch (preset) {
-        case "last-7-days": {
-            const last7Days = getUTCDate(currentDate);
-            last7Days.setUTCDate(last7Days.getUTCDate() - 7);
-            filteredData = details.filter(({ call_start_time }) => {
-                const callDate = call_start_time ? new Date(call_start_time) : null;
-                return callDate && callDate >= last7Days;
-            });
-            break;
+      case "last-7-days": {
+        const last7Days = getUTCDate(currentDate);
+        last7Days.setUTCDate(last7Days.getUTCDate() - 7);
+        filteredData = details.filter(({ call_start_time }) => {
+          const callDate = call_start_time ? new Date(call_start_time) : null;
+          return callDate && callDate >= last7Days;
+        });
+        break;
+      }
+
+      case "last-14-days": {
+        const last14Days = getUTCDate(currentDate);
+        last14Days.setUTCDate(last14Days.getUTCDate() - 14);
+        filteredData = details.filter(({ call_start_time }) => {
+          const callDate = call_start_time ? new Date(call_start_time) : null;
+          return callDate && callDate >= last14Days;
+        });
+        break;
+      }
+
+      case "last-30-days": {
+        const last30Days = getUTCDate(currentDate);
+        last30Days.setUTCDate(last30Days.getUTCDate() - 30);
+        filteredData = details.filter(({ call_start_time }) => {
+          const callDate = call_start_time ? new Date(call_start_time) : null;
+          return callDate && callDate >= last30Days;
+        });
+        break;
+      }
+
+      case "yesterday": {
+        const yesterdayStart = getUTCDate(currentDate);
+        yesterdayStart.setUTCDate(yesterdayStart.getUTCDate() - 1); // Start of yesterday in UTC
+        const yesterdayEnd = getUTCEndOfDay(yesterdayStart); // End of yesterday in UTC
+
+        console.log("Yesterday Start (UTC):", yesterdayStart);
+        console.log("Yesterday End (UTC):", yesterdayEnd);
+
+        filteredData = details.filter(({ call_start_time }) => {
+          const callDate = call_start_time ? new Date(call_start_time) : null;
+          console.log(
+            "Checking call_start_time:",
+            call_start_time,
+            "Parsed as:",
+            callDate
+          );
+
+          // Compare UTC dates
+          return (
+            callDate && callDate >= yesterdayStart && callDate <= yesterdayEnd
+          );
+        });
+        break;
+      }
+
+      case "custom-range": {
+        if (startDate && endDate) {
+          const customStartDate = getUTCDate(startDate); // Ensure start date is a Date object
+          const customEndDate = getUTCEndOfDay(endDate); // Ensure end date is a Date object
+
+          filteredData = details.filter(({ call_start_time }) => {
+            const callDate = call_start_time ? new Date(call_start_time) : null;
+            return (
+              callDate &&
+              callDate >= customStartDate &&
+              callDate <= customEndDate
+            );
+          });
         }
+        break;
+      }
 
-        case "last-14-days": {
-            const last14Days = getUTCDate(currentDate);
-            last14Days.setUTCDate(last14Days.getUTCDate() - 14);
-            filteredData = details.filter(({ call_start_time }) => {
-                const callDate = call_start_time ? new Date(call_start_time) : null;
-                return callDate && callDate >= last14Days;
-            });
-            break;
-        }
-
-        case "last-30-days": {
-            const last30Days = getUTCDate(currentDate);
-            last30Days.setUTCDate(last30Days.getUTCDate() - 30);
-            filteredData = details.filter(({ call_start_time }) => {
-                const callDate = call_start_time ? new Date(call_start_time) : null;
-                return callDate && callDate >= last30Days;
-            });
-            break;
-        }
-
-        case "yesterday": {
-            const yesterdayStart = getUTCDate(currentDate);
-            yesterdayStart.setUTCDate(yesterdayStart.getUTCDate() - 1); // Start of yesterday in UTC
-            const yesterdayEnd = getUTCEndOfDay(yesterdayStart); // End of yesterday in UTC
-
-            console.log("Yesterday Start (UTC):", yesterdayStart);
-            console.log("Yesterday End (UTC):", yesterdayEnd);
-
-            filteredData = details.filter(({ call_start_time }) => {
-                const callDate = call_start_time ? new Date(call_start_time) : null;
-                console.log("Checking call_start_time:", call_start_time, "Parsed as:", callDate);
-
-                // Compare UTC dates
-                return callDate && callDate >= yesterdayStart && callDate <= yesterdayEnd;
-            });
-            break;
-        }
-
-        case "custom-range": {
-            if (startDate && endDate) {
-                const customStartDate = getUTCDate(startDate); // Ensure start date is a Date object
-                const customEndDate = getUTCEndOfDay(endDate); // Ensure end date is a Date object
-
-                filteredData = details.filter(({ call_start_time }) => {
-                    const callDate = call_start_time ? new Date(call_start_time) : null;
-                    return callDate && callDate >= customStartDate && callDate <= customEndDate;
-                });
-            }
-            break;
-        }
-
-        default:
-            filteredData = details;
-            break;
+      default:
+        filteredData = details;
+        break;
     }
 
     console.log(`Filtered Data (${preset}):`, filteredData);
     return filteredData;
-};
+  };
   const getFilteredData = () => {
     let dataToFilter = [];
 
@@ -369,14 +383,15 @@ const LeadSent = () => {
                 <tr className="bg-gray-800 text-white text-left">
                   <th>#</th>
                   <th>Created On</th>
-                  <th>Date </th>
+
+                  <th>Customer Name </th>
                   <th>Phone </th>
+                  <th>Email </th>
                   <th>Source</th>
-                  <th>Lead Date</th>
 
                   <th>Transfer To</th>
                   <th>LVT Agent</th>
-                  <th>Follow Up Date</th>
+                  <th>Lead Date </th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -400,24 +415,14 @@ const LeadSent = () => {
                             })
                           : "" || "N/A"}
                       </td>
-                      <td>
-                        {row.call_start_time
-                          ? new Date(row.call_start_time).toLocaleString(
-                              "en-GB",
-                              {
-                                timeZone: "UTC", // Force UTC time
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                              }
-                            )
-                          : "N/A"}
-                      </td>
+
+                      <td>{row.cust_name || "N/A"}</td>
                       <td>{row.phone || "N/A"}</td>
+                      <td>{row.email || "N/A"}</td>
                       <td>{row.source || "N/A"}</td>
-                      <td>{row.lead_date  || "N/A"}</td>
                       <td>{"N/A"}</td>
                       <td>{row.agent_username || "N/A"}</td>
+                      <td>{row.lead_date || "N/A"}</td>
                     </tr>
                   ))
                 ) : (
@@ -449,8 +454,5 @@ const LeadSent = () => {
 };
 
 export default LeadSent;
-
-
-
 
 // transfer call i only want and the count of yesterday so i need build the backend work on this monday

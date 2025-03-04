@@ -933,8 +933,9 @@ const MarketingReport = () => {
                           className="hover:bg-gray-50 transition-colors duration-200"
                         >
                           <td className="border border-gray-200 px-4 py-3 align-top">
-                            {date}
+                            {new Date(date).toLocaleDateString("en-GB")}
                           </td>
+
                           <td className="border border-gray-200 px-4 py-3 align-top">
                             {leadsMap.get(date) ?? "N/A"}
                           </td>
@@ -1004,6 +1005,7 @@ const MarketingReport = () => {
             </div>
           </div>
         </div>
+        
       </div>
     </div>
   );
