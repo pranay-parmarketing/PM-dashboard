@@ -76,7 +76,7 @@ const createPacksent = async () => {
   }
 };
 
-cron.schedule("53 8 * * *", async () => {
+cron.schedule("0 0 * * *", async () => {
   console.log("⏳ Running scheduled Zoho API fetch at 12 AM...");
   await createPacksent();
 });

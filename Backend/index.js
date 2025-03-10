@@ -128,7 +128,7 @@ app.get('/custom-proxy', async (req, res) => {
 // 
 
 // Run cron job at 12 AM
-cron.schedule("31 9 * * *", async () => {
+cron.schedule("0 0 * * *", async () => {
   await scheduledPacksentFetch();
 }, {
   scheduled: true,
