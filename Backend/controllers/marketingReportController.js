@@ -612,24 +612,14 @@ const getMarketingReport = async (req, res) => {
     const dmpsByDay = await DMP.aggregate([
       {
         $match: {
-          Created_On: { $ne: "" }, // Ignore empty values
+          createdAt: { $exists: true }, // Ensure createdAt exists
           first_disposition: "Explained DMP", // Filter only "Explained DMP"
+          createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) } // Match date range
         },
       },
-      {
-        $addFields: {
-          createdDate: { $substr: ["$Created_On", 0, 10] }, // Extract only date (YYYY-MM-DD or M/D/YY)
-        },
-      },
-      {
-        $match: {
-          createdDate: { $gte: startDate, $lte: endDate }, // Match date range
-        },
-      },
-
       {
         $group: {
-          _id: "$createdDate", // Group by date
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, // Group by date
           count: { $sum: 1 }, // Count documents
         },
       },
@@ -637,6 +627,7 @@ const getMarketingReport = async (req, res) => {
         $sort: { _id: 1 }, // Sort by date in ascending order
       },
     ]);
+    
     
 
     const enrollsByDay = await Enroll.aggregate([

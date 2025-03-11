@@ -110,6 +110,163 @@ const createDmpData = async (req, res) => {
   }
 };
 
+// const getDmpData = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const pageSize = parseInt(req.query.pageSize) || 10;
+//     const search = req.query.search || "";
+//     let startDate = req.query.startDate || null;
+//     let endDate = req.query.endDate || null;
+//     const filterPreset = req.query.filterPreset || "";
+//     const sortBy = req.query.sortBy || "createdAt"; // Ensure sorting is based on timestamp
+//     const sortDirection = req.query.sortDirection || "desc";
+//     const sortOrder = sortDirection === "asc" ? 1 : -1;
+
+//     if (page <= 0 || pageSize <= 0) {
+//       return res.status(400).json({ error: "Invalid pagination parameters" });
+//     }
+
+//     const skip = (page - 1) * pageSize;
+
+//     // Date filtering logic...
+//     if (filterPreset) {
+//       const currentDate = new Date();
+//       switch (filterPreset) {
+//         case "last-7-days":
+//           startDate = new Date(currentDate);
+//           startDate.setDate(currentDate.getDate() - 7);
+//           startDate.setUTCHours(0, 0, 0, 0);
+//           endDate = new Date(currentDate);
+//           endDate.setUTCHours(23, 59, 59, 999);
+//           break;
+//         case "last-14-days":
+//           startDate = new Date(currentDate);
+//           startDate.setDate(currentDate.getDate() - 14);
+//           startDate.setUTCHours(0, 0, 0, 0);
+//           endDate = new Date(currentDate);
+//           endDate.setUTCHours(23, 59, 59, 999);
+//           break;
+//         case "last-30-days":
+//           startDate = new Date(currentDate);
+//           startDate.setDate(currentDate.getDate() - 30);
+//           startDate.setUTCHours(0, 0, 0, 0);
+//           endDate = new Date(currentDate);
+//           endDate.setUTCHours(23, 59, 59, 999);
+//           break;
+//         case "yesterday":
+//           startDate = new Date(currentDate);
+//           startDate.setDate(currentDate.getDate() - 1);
+//           startDate.setUTCHours(0, 0, 0, 0);
+//           endDate = new Date(startDate);
+//           endDate.setUTCHours(23, 59, 59, 999);
+//           break;
+//         case "custom-range":
+//           if (startDate && endDate) {
+//             startDate = new Date(startDate);
+//             endDate = new Date(endDate);
+//             endDate.setUTCHours(23, 59, 59, 999);
+//           } else {
+//             return res.status(400).json({
+//               error: "Both startDate and endDate are required for custom-range",
+//             });
+//           }
+//           break;
+//       }
+//     }
+
+//     if (startDate && isNaN(new Date(startDate).getTime())) {
+//       return res.status(400).json({ error: "Invalid startDate" });
+//     }
+//     if (endDate && isNaN(new Date(endDate).getTime())) {
+//       return res.status(400).json({ error: "Invalid endDate" });
+//     }
+
+//     if (startDate) startDate = new Date(startDate);
+//     if (endDate) {
+//       endDate = new Date(endDate);
+//       endDate.setUTCHours(23, 59, 59, 999);
+//     }
+
+//     // Search filter
+//     const searchFields = [
+//       "phone",
+//       "source",
+//       "agent_username",
+//       "cust_name",
+//       "first_disposition",
+//     ];
+//     const searchFilter = search
+//       ? {
+//           $or: searchFields.map((field) => ({
+//             [field]: { $regex: search, $options: "i" },
+//           })),
+//         }
+//       : {};
+
+//     if (startDate && endDate) {
+//       searchFilter.createdAt = {
+//         $gte: startDate,
+//         $lte: endDate,
+//       };
+//     }
+
+//     console.log('searchFilter', searchFilter); // Debugging
+
+//     // Query DMP data
+//     let dmps = await Dmp.find(searchFilter)
+//       .sort({ [sortBy]: sortOrder, _id: -1 })
+//       .skip(skip)
+//       .limit(pageSize);
+
+//     // Fetch Leads and match with DMPs
+//     const leadPhones = dmps.map((dmp) => dmp.phone);
+//     const leads = await Leads.find({ phone: { $in: leadPhones } });
+
+//     // Add lead_date if a matching lead exists
+//     dmps = dmps.map((dmp) => {
+//       const lead = leads.find((lead) => lead.phone === dmp.phone);
+//       return {
+//         ...dmp._doc, // Spread existing DMP data
+//         lead_date: lead ? lead.createdOn : null, // Add lead_date from Lead model
+//       };
+//     });
+
+//     // Get total count of documents
+//     const totalDmps = await Dmp.countDocuments(searchFilter);
+//     const totalPages = Math.ceil(totalDmps / pageSize);
+
+//     // Calculate yesterday's count based on `createdAt`
+//     const yesterday = new Date();
+//     yesterday.setDate(yesterday.getDate() - 1);
+//     const startOfYesterday = new Date(yesterday);
+//     startOfYesterday.setUTCHours(0, 0, 0, 0);
+//     const endOfYesterday = new Date(startOfYesterday);
+//     endOfYesterday.setUTCHours(23, 59, 59, 999);
+
+//     const yesterdayFilter = {
+//       createdAt: {
+//         $gte: startOfYesterday,
+//         $lte: endOfYesterday,
+//       },
+//     };
+
+//     const yesterdayCount = await Dmp.countDocuments(yesterdayFilter);
+
+//     res.status(200).json({
+//       dmps,
+//       currentPage: page,
+//       totalPages,
+//       totalDmps,
+//       yesterdayCount,
+//     });
+//   } catch (error) {
+//     console.error("Error occurred while fetching DMP data:", error);
+//     return res.status(500).json({
+//       error: "Internal Server Error",
+//       details: error.message,
+//     });
+//   }
+// };
 
 const getDmpData = async (req, res) => {
   try {

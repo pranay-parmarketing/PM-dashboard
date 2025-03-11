@@ -223,7 +223,7 @@ const Visitor = () => {
         <div className="flex flex-col md:flex-row justify-between items-center p-4 space-y-2 md:space-y-0 ml-[70px]">
           <h1 className="page-title text-2xl font-semibold text-gray-800 text-center ">
             {" "}
-            Pack Sent
+            Visitors
           </h1>
           <div className="button-container flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center">
             <button
